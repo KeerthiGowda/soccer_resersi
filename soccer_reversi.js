@@ -4,6 +4,8 @@ frameRate(60);
 
 // Use forces to move the ball
 
+// Use forces to move the ball
+
 translate(0,0);
 angleMode = "radian";
 var oneDegree = 3.14/180;
@@ -310,8 +312,8 @@ coin.prototype.update = function(){
 
 keyPressed = function(){
   keyArray[keyCode]=1;
+  keyPress = 1;
   if(game_vars.startscreen ===1){
-      //println(40*keyArray[DOWN] - 40*keyArray[UP]);
       arrow_array[0].y+=40*keyArray[DOWN] - 40*keyArray[UP] ;
       arrow_array[1].y+=40*keyArray[DOWN] - 40*keyArray[UP] ;
       if(keyArray[10]===1){
@@ -353,6 +355,7 @@ keyPressed = function(){
 
 keyReleased = function(){
   keyArray[keyCode]=0;
+    keyPress = 0;
 };
 
 board = new board_sample(320,300);
@@ -675,10 +678,6 @@ var drawBackground = function(){
 };
 
 
-var keyPressed = function() {
-    keyArray[keyCode] = 1;
-    keyPress = 1;
-};
 var keyReleased = function() {
     keyArray[keyCode] = 0;
     keyPress = 0;
@@ -829,6 +828,7 @@ draw = function() {
      
      
 };
+
 
 
 }};
