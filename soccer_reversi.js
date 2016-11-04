@@ -6,6 +6,8 @@ frameRate(60);
 
 // Use forces to move the ball
 
+// Use forces to move the ball
+
 translate(0,0);
 angleMode = "radian";
 var oneDegree = 3.14/180;
@@ -19,8 +21,10 @@ var b = 0;
 var initialized = 0;
 var keyPress = 0;
 var framerate = frameCount;
+var k_a=random(1500);
 
 // arvind
+var enter =0;
 var light;
 keyArray[UP] = keyArray[DOWN] = 0;
 var arrow_array = [];
@@ -32,6 +36,10 @@ var board_image = [];
 var drawing=0;
 var count=0;
 var ic=0;
+var a_c=0;
+var a_n1 = random(1500);
+var a_n2 = 0;
+var a_a = random(1500);
 
 var game_vars1 = function(){		// declaring variable which controls state of game
   this.startscreen = 1;
@@ -39,6 +47,8 @@ var game_vars1 = function(){		// declaring variable which controls state of game
   this.gamescreen2 = 0;
   this.winscreen = 0;
   this.helpscreen = 0;
+  this.helpscreen_soccer = 0;
+  this.helpscreen_reversi = 0;
   this.aboutscreen=0;
 };
 
@@ -177,14 +187,23 @@ arrow.prototype.draw = function() {
 arrow.prototype.update = function(){
     this.a+=0.1;
     if(this.a>3.141){this.a = -3.414;}
-    if(this.y>=230){
-        this.y=230;
-    }    
-    if(this.y<=110){
-        this.y=110;
+
+    if(game_vars.startscreen ===1){
+        if(this.y>=230){
+            this.y=230;
+        }    
+        if(this.y<=110){
+            this.y=110;
+        }
     }
-
-
+    if(game_vars.helpscreen === 1){
+        if(this.y>=230){
+            this.y=230;
+        }    
+        if(this.y<=190){
+            this.y=190;
+        }
+    }
 
 };
 
@@ -311,26 +330,32 @@ coin.prototype.update = function(){
 };
 
 keyPressed = function(){
-  keyArray[keyCode]=1;
+  enter=0;
   keyPress = 1;
-  if(game_vars.startscreen ===1){
+  keyArray[keyCode]=1;
+  if((game_vars.startscreen ===1 )  && enter === 0){
+      enter=1;
       arrow_array[0].y+=40*keyArray[DOWN] - 40*keyArray[UP] ;
       arrow_array[1].y+=40*keyArray[DOWN] - 40*keyArray[UP] ;
       if(keyArray[10]===1){
           if(arrow_array[0].y===110){
               game_vars.gamescreen1=1;
               game_vars.gamescreen2=0;
-              game_vars.startscreen=0;
+              game_vars.startscreen=1;  // edit this
               game_vars.winscreen=0;
-              game_vars.helpscreen=0;
+              game_vars.helpscreen = 0;
+              game_vars.helpscreen_soccer = 0;
+              game_vars.helpscreen_reversi = 0;
               game_vars.aboutscreen=0;
           }
           if(arrow_array[0].y===150){
               game_vars.gamescreen1=0;
               game_vars.gamescreen2=1;
-              game_vars.startscreen=0;
+              game_vars.startscreen=1;  // edit this
               game_vars.winscreen=0;
-              game_vars.helpscreen=0;
+              game_vars.helpscreen = 0;
+              game_vars.helpscreen_soccer = 0;
+              game_vars.helpscreen_reversi = 0;
               game_vars.aboutscreen=0;
           }
           if(arrow_array[0].y===190){
@@ -339,6 +364,8 @@ keyPressed = function(){
               game_vars.startscreen=0;
               game_vars.winscreen=0;
               game_vars.helpscreen=1;
+              game_vars.helpscreen_soccer = 0;
+              game_vars.helpscreen_reversi = 0;
               game_vars.aboutscreen=0;
           }
           if(arrow_array[0].y===230){
@@ -347,10 +374,97 @@ keyPressed = function(){
               game_vars.startscreen=0;
               game_vars.winscreen=0;
               game_vars.helpscreen=0;
+              game_vars.helpscreen_soccer = 0;
+              game_vars.helpscreen_reversi = 0;
               game_vars.aboutscreen=1;
           }
       }
   }
+ 
+    if(game_vars.aboutscreen ===1 && enter === 0 ){
+      enter=1;
+      //println(40*keyArray[DOWN] - 40*keyArray[UP]);
+      if(keyArray[8]===1){
+              game_vars.gamescreen1=0;
+              game_vars.gamescreen2=0;
+              game_vars.startscreen=1;
+              game_vars.winscreen=0;
+              game_vars.helpscreen=0;
+              game_vars.helpscreen_soccer = 0;
+              game_vars.helpscreen_reversi = 0;
+              game_vars.aboutscreen=0;
+      }
+    }
+    
+    if(game_vars.helpscreen ===1 && enter === 0 ){
+      enter=1;
+      arrow_array[0].y+=40*keyArray[DOWN] - 40*keyArray[UP] ;
+      arrow_array[1].y+=40*keyArray[DOWN] - 40*keyArray[UP] ;
+      //println(40*keyArray[DOWN] - 40*keyArray[UP]);
+      if(keyArray[8]===1){
+              game_vars.gamescreen1=0;
+              game_vars.gamescreen2=0;
+              game_vars.startscreen=1;
+              game_vars.winscreen=0;
+              game_vars.helpscreen=0;
+              game_vars.helpscreen_soccer = 0;
+              game_vars.helpscreen_reversi = 0;
+              game_vars.aboutscreen=0;
+      }
+      if(keyArray[10]===1){
+          if(arrow_array[0].y===190){
+              game_vars.gamescreen1=0;
+              game_vars.gamescreen2=0;
+              game_vars.startscreen=0;
+              game_vars.winscreen=0;
+              game_vars.helpscreen=0;
+              game_vars.helpscreen_soccer = 0;
+              game_vars.helpscreen_reversi = 1;
+              game_vars.aboutscreen=0;
+          }
+          if(arrow_array[0].y===230){
+              game_vars.gamescreen1=0;
+              game_vars.gamescreen2=0;
+              game_vars.startscreen=0;
+              game_vars.winscreen=0;
+              game_vars.helpscreen = 0;
+              game_vars.helpscreen_soccer = 1;
+              game_vars.helpscreen_reversi = 0;
+              game_vars.aboutscreen=0;
+          }
+      }
+    }
+    
+    if(game_vars.helpscreen_soccer ===1 && enter === 0 ){
+      enter=1;
+      //println(40*keyArray[DOWN] - 40*keyArray[UP]);
+      if(keyArray[8]===1){
+              game_vars.gamescreen1=0;
+              game_vars.gamescreen2=0;
+              game_vars.startscreen=0;
+              game_vars.winscreen=0;
+              game_vars.helpscreen=1;
+              game_vars.helpscreen_soccer = 0;
+              game_vars.helpscreen_reversi = 0;
+              game_vars.aboutscreen=0;
+      }
+    }
+    
+    if(game_vars.helpscreen_reversi ===1 && enter === 0 ){
+      enter=1;
+      //println(40*keyArray[DOWN] - 40*keyArray[UP]);
+      if(keyArray[8]===1){
+              game_vars.gamescreen1=0;
+              game_vars.gamescreen2=0;
+              game_vars.startscreen=0;
+              game_vars.winscreen=0;
+              game_vars.helpscreen=1;
+              game_vars.helpscreen_soccer = 0;
+              game_vars.helpscreen_reversi = 0;
+              game_vars.aboutscreen=0;
+      }
+    }
+    
 };
 
 keyReleased = function(){
@@ -695,6 +809,8 @@ ballObj.prototype.draw = function(x,y) {
   rotate(this.angle);
   fill(10, 196, 196,200);
   ellipse(0, 0,this.size, this.size);
+  stroke(132, 167, 209);
+  strokeWeight(1);
   arc(0,0,this.size, this.size/2, 0, 180*oneDegree);
   arc(0,-this.size/3,this.size, this.size/2, 20 * oneDegree, 160*oneDegree);
   
@@ -763,6 +879,7 @@ npcObj.prototype.move = function() {
             ball.position.y+=5;
         }  
     }
+    
 };
 
 
@@ -783,7 +900,6 @@ var startScreenAnimation = function(){
     }
     popMatrix();
     
-    ball.draw(ball.position.x, ball.position.y);
     
     if(initialScale>4){
         initialPlayer.position.y = 100;
@@ -793,7 +909,7 @@ var startScreenAnimation = function(){
 
 draw = function() {
     
-     if(game_vars.startscreen === 1){
+     if(game_vars.startscreen === 1 | game_vars.gamescreen1===1  | game_vars.gamescreen2===1 ){
         pushMatrix();
         //translate(300,300);
         background(40, 176, 19);
@@ -802,9 +918,16 @@ draw = function() {
         if(initialized === 0){
             initializeSoccerCharacters();
         }
-        startScreenAnimation();
+        
         /* Soccer End */
         
+        for (i=0; i<=400; i+=8) {
+            for (j=0; j<=400; j+=8) {
+                fill(164, 181, 9);
+                rect(i,j,4,4);
+            }
+        }
+        startScreenAnimation();
         board.draw();
         arrow_array[0].draw();
         arrow_array[1].draw();
@@ -812,14 +935,106 @@ draw = function() {
         light.draw();
         fill(4, 0, 255);
         textSize(30);
-        text("TITLE",160,40,300,200);
-        text("Game 1 " ,150,100,300,200);
-        text("Game 2 " ,150,140,300,200);
+        fill(19, 99, 51);
+        
+        var f = createFont("Bauhaus 93");
+        textFont(f, 40);
+        fill(161, 39, 8);
+        text("Board and field game",10,40,450,200);
+        fill(54, 42, 19);
+         textFont(f, 30);
+        text("Reversi " ,150,100,300,200);
+        text("Soccer " ,150,140,300,200);
         text("Help " ,170,180,300,200);
         text("About " ,160,220,300,200);
         popMatrix();
     }
      
+     if(game_vars.helpscreen === 1){
+        background(40, 176, 19);
+    
+        noStroke();
+        var n1 = k_a;  
+        for (var x=0; x<=400; x+=8) {
+        var n2 = 0;
+        for (var y=0; y<=400; y+=8) {
+            var c = map(noise(n1,n2),0,1,0,255);
+            fill(0, c, 0,150);
+            rect(x,y,8,8);
+            n2 += 0.01; // step size in noise
+        }
+        n1 += 0.01; // step size in noise
+        }
+    k_a -= 0.01;  // speed of clouds
+        
+        arrow_array[0].draw();
+        arrow_array[1].draw();
+        
+        var f = createFont("Bauhaus 93");
+        textFont(f, 25);
+        fill(54, 42, 19);
+        text("HELP",30,20,300,200);
+        text("Reversi " ,160,180,300,200);
+        text("Soccer " ,160,220,300,200);
+     }
+     
+     if(game_vars.helpscreen_soccer === 1){
+        background(12, 125, 14);
+        noStroke();
+        ball.size = 100;
+        ball.draw(330, 100);
+        ball.angle = ball.angle + 1 * oneDegree;
+        
+        fill(66, 25, 25);
+        var f = createFont("Bauhaus 93");
+        textFont(f, 25);
+        text("HELP",30,20,300,200);
+        
+        var f = createFont("Calibri");
+        textFont(f, 15);
+        fill(247, 247, 247);
+        text("You would be playing soccer with the computer.\n\nUse the arrow keys to navigate the active player from your team \n\nActive player will be automatically selected based on the ball's current location\n\n",30,50,220,400);
+        text("Click the mouse on canvas to pass the ball to the specific location\n\n The game would be for 5 minutes and the team with highest score wins the game\n\n If the match ties, then the decision will be based on the penalty shoot out\n                                  HAPPY SOCCER ",30,230,320,400);
+        
+        
+     }
+     
+      if(game_vars.helpscreen_reversi === 1){
+        background(12, 125, 14);
+        pushMatrix();
+        if(frameCount - count > 90){
+            count = frameCount;
+            ic++;
+        }
+        if(ic===3){ic=0;}
+        image(board_image[ic],270,30,120,120);
+        translate(0,-200);
+        translate(0,-50);
+        stroke(0, 0, 0);
+        popMatrix();
+
+
+        fill(74, 19, 2);
+        var f = createFont("Bauhaus 93");
+        textFont(f, 25);
+        
+        text("HELP",30,20,300,200);
+        var f = createFont("Calibri");
+        textFont(f, 15);
+        fill(247, 247, 247);
+        text("Reversi is a two player board game. Each player controls either the black or the white tile.  The black gets to move first. At any point in the game any square on the 8x8 board can only be occupied by either a tile of one color.",30,50,220,400);
+        text("Each turn consists of one player placing one tile of his color in any one of the spaces which allows him to capture his opponent’s tiles. The tiles can be captured vertically, horizontally and diagonally. The above figures show all the legal positions available and how the captured pieces are flipped. The game is played until no position on the board is a legal position for either of the player. If one player at any point in the game does not have a legal move, he must pass. The winner is the player who has the most number of tiles at the end of the game.",30,190,320,400);
+        //text("It is a ",30,70,300,200);
+        
+
+    }
+    if(game_vars.aboutscreen === 1){
+        background(0, 255, 230);
+        fill(255, 0, 0);
+        text("Authors : ",40,100,400,400);
+        text("Aravind V",40,200,400,400);
+        text("Keerthi G",40,150,400,400);
+    }
      //ball.draw(ball.position.x, ball.position.y);
     /* player.draw();
      
@@ -828,7 +1043,6 @@ draw = function() {
      
      
 };
-
 
 
 }};
