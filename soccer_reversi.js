@@ -8,6 +8,8 @@ frameRate(60);
 
 // Use forces to move the ball
 
+// Use forces to move the ball
+
 translate(0,0);
 angleMode = "radian";
 var oneDegree = 3.14/180;
@@ -401,7 +403,7 @@ keyPressed = function(){
       arrow_array[0].y+=40*keyArray[DOWN] - 40*keyArray[UP] ;
       arrow_array[1].y+=40*keyArray[DOWN] - 40*keyArray[UP] ;
       //println(40*keyArray[DOWN] - 40*keyArray[UP]);
-      if(keyArray[8]===1){
+      if(keyArray[37]===1){
               game_vars.gamescreen1=0;
               game_vars.gamescreen2=0;
               game_vars.startscreen=1;
@@ -438,7 +440,7 @@ keyPressed = function(){
     if(game_vars.helpscreen_soccer ===1 && enter === 0 ){
       enter=1;
       //println(40*keyArray[DOWN] - 40*keyArray[UP]);
-      if(keyArray[8]===1){
+      if(keyArray[37]===1){
               game_vars.gamescreen1=0;
               game_vars.gamescreen2=0;
               game_vars.startscreen=0;
@@ -453,7 +455,7 @@ keyPressed = function(){
     if(game_vars.helpscreen_reversi ===1 && enter === 0 ){
       enter=1;
       //println(40*keyArray[DOWN] - 40*keyArray[UP]);
-      if(keyArray[8]===1){
+      if(keyArray[37]===1){
               game_vars.gamescreen1=0;
               game_vars.gamescreen2=0;
               game_vars.startscreen=0;
@@ -1043,6 +1045,5 @@ draw = function() {
      
      
 };
-
 
 }};
