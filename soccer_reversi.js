@@ -3,11 +3,6 @@ size(400, 400);
 frameRate(60);
 
 // Use forces to move the ball
-
-// Use forces to move the ball
-
-// Use forces to move the ball
-
 // Use forces to move the ball
 
 translate(0,0);
@@ -386,7 +381,7 @@ keyPressed = function(){
     if(game_vars.aboutscreen ===1 && enter === 0 ){
       enter=1;
       //println(40*keyArray[DOWN] - 40*keyArray[UP]);
-      if(keyArray[8]===1){
+      if(keyArray[37]===1){
               game_vars.gamescreen1=0;
               game_vars.gamescreen2=0;
               game_vars.startscreen=1;
@@ -1025,17 +1020,37 @@ draw = function() {
         textFont(f, 15);
         fill(247, 247, 247);
         text("Reversi is a two player board game. Each player controls either the black or the white tile.  The black gets to move first. At any point in the game any square on the 8x8 board can only be occupied by either a tile of one color.",30,50,220,400);
-        text("Each turn consists of one player placing one tile of his color in any one of the spaces which allows him to capture his opponent’s tiles. The tiles can be captured vertically, horizontally and diagonally. The above figures show all the legal positions available and how the captured pieces are flipped. The game is played until no position on the board is a legal position for either of the player. If one player at any point in the game does not have a legal move, he must pass. The winner is the player who has the most number of tiles at the end of the game.",30,190,320,400);
+        text("Each turn consists of one player placing one tile of his color in any one of the spaces which allows him to capture his opponents tiles. The tiles can be captured vertically, horizontally and diagonally. The above figures show all the legal positions available and how the captured pieces are flipped. The game is played until no position on the board is a legal position for either of the player. If one player at any point in the game does not have a legal move, he must pass. The winner is the player who has the most number of tiles at the end of the game.",30,190,320,400);
         //text("It is a ",30,70,300,200);
         
 
     }
     if(game_vars.aboutscreen === 1){
         background(0, 255, 230);
-        fill(255, 0, 0);
+        
+        background(40, 176, 19);
+    
+        noStroke();
+        var n1 = k_a;  
+        for (var x=0; x<=400; x+=8) {
+        var n2 = 0;
+        for (var y=0; y<=400; y+=8) {
+            var c = map(noise(n1,n2),0,1,0,255);
+            fill(0, c, 0,150);
+            rect(x,y,8,8);
+            n2 += 0.01; // step size in noise
+        }
+        n1 += 0.01; // step size in noise
+        }
+    k_a -= 0.01;  // speed of clouds
+        
+        fill(59, 5, 5);
+         var f = createFont("Bauhaus 93");
+        textFont(f, 25);
         text("Authors : ",40,100,400,400);
+        textFont(f, 20);
         text("Aravind V",40,200,400,400);
-        text("Keerthi G",40,150,400,400);
+        text("Keerthi G",40,170,400,400);
     }
      //ball.draw(ball.position.x, ball.position.y);
     /* player.draw();
@@ -1045,5 +1060,6 @@ draw = function() {
      
      
 };
+
 
 }};
