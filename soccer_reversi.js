@@ -5,6 +5,8 @@ frameRate(60);
 // Use forces to move the ball
 // Use forces to move the ball
 
+// Use forces to move the ball
+
 translate(0,0);
 angleMode = "radian";
 var oneDegree = 3.14/180;
@@ -348,7 +350,7 @@ keyPressed = function(){
           if(arrow_array[0].y===150){
               game_vars.gamescreen1=0;
               game_vars.gamescreen2=1;
-              game_vars.startscreen=1;  // edit this
+              game_vars.startscreen=0;  // edit this
               game_vars.winscreen=0;
               game_vars.helpscreen = 0;
               game_vars.helpscreen_soccer = 0;
@@ -462,6 +464,20 @@ keyPressed = function(){
       }
     }
     
+    if(game_vars.gamescreen2 ===1 && enter === 0 ){
+      enter=1;
+      //println(40*keyArray[DOWN] - 40*keyArray[UP]);
+      if(keyArray[37]===1){
+              game_vars.gamescreen1=0;
+              game_vars.gamescreen2=0;
+              game_vars.startscreen=1;
+              game_vars.winscreen=0;
+              game_vars.helpscreen=0;
+              game_vars.helpscreen_soccer = 0;
+              game_vars.helpscreen_reversi = 0;
+              game_vars.aboutscreen=0;
+      }
+    }
 };
 
 keyReleased = function(){
@@ -805,7 +821,7 @@ ballObj.prototype.draw = function(x,y) {
   translate(x,y);
   rotate(this.angle);
   fill(10, 196, 196,200);
-  ellipse(0, 0,this.size, this.size);
+  ellipse(0, 0,this.size+5, this.size+5);
   stroke(132, 167, 209);
   strokeWeight(1);
   arc(0,0,this.size, this.size/2, 0, 180*oneDegree);
@@ -906,7 +922,7 @@ var startScreenAnimation = function(){
 
 draw = function() {
     
-     if(game_vars.startscreen === 1 | game_vars.gamescreen1===1  | game_vars.gamescreen2===1 ){
+     if(game_vars.startscreen === 1 |  game_vars.gamescreen2===1 ){
         pushMatrix();
         //translate(300,300);
         background(40, 176, 19);
@@ -973,6 +989,9 @@ draw = function() {
         text("HELP",30,20,300,200);
         text("Reversi " ,160,180,300,200);
         text("Soccer " ,160,220,300,200);
+        var f = createFont("Calibri");
+        textFont(f, 15);
+        text("Press <- [LEFT] key to go back", 5, 380, 400, 300);
      }
      
      if(game_vars.helpscreen_soccer === 1){
@@ -991,7 +1010,12 @@ draw = function() {
         textFont(f, 15);
         fill(247, 247, 247);
         text("You would be playing soccer with the computer.\n\nUse the arrow keys to navigate the active player from your team \n\nActive player will be automatically selected based on the ball's current location\n\n",30,50,220,400);
-        text("Click the mouse on canvas to pass the ball to the specific location\n\n The game would be for 5 minutes and the team with highest score wins the game\n\n If the match ties, then the decision will be based on the penalty shoot out\n                                  HAPPY SOCCER ",30,230,320,400);
+        text("Click the mouse on canvas to pass the ball to the specific location\n\n The game would be for 5 minutes and the team with highest score wins the game\n\n If the match ties, then the decision will be based on the penalty shoot out\n",30,230,320,400);
+        
+        fill(89, 6, 6);
+        var f = createFont("Calibri");
+        textFont(f, 15);
+        text("Press <- [LEFT] key to go back", 5, 380, 400, 300);
         
         
      }
@@ -1020,14 +1044,17 @@ draw = function() {
         textFont(f, 15);
         fill(247, 247, 247);
         text("Reversi is a two player board game. Each player controls either the black or the white tile.  The black gets to move first. At any point in the game any square on the 8x8 board can only be occupied by either a tile of one color.",30,50,220,400);
-        text("Each turn consists of one player placing one tile of his color in any one of the spaces which allows him to capture his opponents tiles. The tiles can be captured vertically, horizontally and diagonally. The above figures show all the legal positions available and how the captured pieces are flipped. The game is played until no position on the board is a legal position for either of the player. If one player at any point in the game does not have a legal move, he must pass. The winner is the player who has the most number of tiles at the end of the game.",30,190,320,400);
+        text("Each turn consists of one player placing one tile of his color in any one of the spaces which allows him to capture his opponent’s tiles. The tiles can be captured vertically, horizontally and diagonally. The above figures show all the legal positions available and how the captured pieces are flipped. The game is played until no position on the board is a legal position for either of the player. If one player at any point in the game does not have a legal move, he must pass. The winner is the player who has the most number of tiles at the end of the game.",30,190,320,400);
         //text("It is a ",30,70,300,200);
         
-
+         fill(89, 6, 6);
+        var f = createFont("Calibri");
+        textFont(f, 15);
+        text("Press <- [LEFT] key to go back", 5, 385, 400, 300);
+        
     }
     if(game_vars.aboutscreen === 1){
-        background(0, 255, 230);
-        
+       
         background(40, 176, 19);
     
         noStroke();
@@ -1051,7 +1078,26 @@ draw = function() {
         textFont(f, 20);
         text("Aravind V",40,200,400,400);
         text("Keerthi G",40,170,400,400);
+        
+        fill(89, 6, 6);
+        var f = createFont("Calibri");
+        textFont(f, 15);
+        text("Press <- [LEFT] key to go back", 5, 380, 400, 300);
+        
     }
+    
+    if(game_vars.gamescreen2===1 ){
+        drawBackground();
+        ball.size = 10;
+        ball.draw(200, 200);
+        image(myImages[0], 160, 180, 15, 30);
+        image(myImages[3], 230, 180, 15, 30);
+        var f = createFont("Calibri");
+        textFont(f, 15);
+        text("Press <- [LEFT] key to go back", 5, 380, 400, 300);
+    }
+    
+    
      //ball.draw(ball.position.x, ball.position.y);
     /* player.draw();
      
