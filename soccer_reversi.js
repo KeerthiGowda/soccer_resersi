@@ -1,13 +1,14 @@
 var sketchProc=function(processingInstance){ with (processingInstance){
 size(400, 400); 
 frameRate(60);
-
-
+	
 translate(0,0);
 angleMode = "radian";
 var oneDegree = 3.14/180;
 var centerX = 200;
 var centerY = 200;
+var user_X = 0;
+var user_Y = 0;
 var keyArray = [];
 var myImages = [];
 var r=255;
@@ -35,10 +36,32 @@ var a_c=0;
 var a_n1 = random(1500);
 var a_n2 = 0;
 var a_a = random(1500);
+var a_mouse_click = [];
+var a_player = 1;
+var a_h_player = 0;
+var a_game_over = 0;
+var a_all_occupied = 0;
+var a_no_moves = 0;
+var a_result1=1;
+var a_result2=1;
+var a_no_move_h=0;
+var a_no_move_c=0;
+var a_valid_move = 0;
+var a_valid_move_0 = 1;
+var a_valid_move_1 = 1;
+var a_final_board;
+var a_hint_board = [];
+for( var a_p=0;a_p<8;a_p++){
+    a_hint_board[a_p]=[];
+    for(var a_q=0;a_q<8;a_q++){
+        a_hint_board[a_p][a_q]=0;
+    }
+}
 
 var game_vars1 = function(){		// declaring variable which controls state of game
   this.startscreen = 1;
   this.gamescreen1 = 0;
+  this.endscreen1 = 0;
   this.gamescreen2 = 0;
   this.winscreen = 0;
   this.helpscreen = 0;
@@ -49,6 +72,16 @@ var game_vars1 = function(){		// declaring variable which controls state of game
 
 /******* Reversi **********/
 
+var a_node = function(){
+	this.a_parent = [0,0];
+	this.children = [];
+	this.type = 0;
+	this.visit = 0;
+	this.move = [];
+	this.score0=0;
+	this.score1=1;
+	
+};
 for(i=0;i<8;i++){
     board_map[i]=[];
 }
@@ -159,6 +192,228 @@ board_map[3][4]=1;
 
 var game_vars = new game_vars1();
 
+var check_legal_move = function(move,player){
+    //println("Function called");
+    
+    var tiles_flipped = [];
+    var on_board=1;
+    var starty = move[0];
+    var startx = move[1];
+    var x = startx;
+    var y = starty;
+    var directions = [];
+    var my_tile;
+    var other_tile;
+    directions.push([0,1]);
+    directions.push([1,1]);
+    directions.push([-1,1]);
+    directions.push([1,0]);
+    directions.push([1,-1]);
+    directions.push([0,-1]);
+    directions.push([-1,-1]);
+    directions.push([-1,0]);
+
+    
+    if(player === 1)
+    {
+        my_tile = 1;
+        other_tile = 0;
+    }
+    
+    else if(player === 0)
+    {
+        my_tile = 0;
+        other_tile = 1;
+    }
+    
+    //board_map[startx][starty] = my_tile;
+    
+    ////println("before beginning of for loop");
+    for(var i =0; i <8;i++){
+        //println("Starting of for loop");
+        on_board=1;
+        x=startx;
+        y=starty;
+        var stepx = directions[i][1];
+        var stepy = directions[i][0];
+        x+=stepx;
+        y+=stepy;
+        //println("outer For loop " + i + " Direction " + directions[i][1] + " " + directions[i][0] + " starting x y " + x + " " + y + " " + other_tile);
+        //println(board_map[x][y]=== other_tile);
+        //println((x<8 && y < 8 && x > 0 && y > 0)&&(board_map[x][y]=== other_tile));
+        if((x<8 && y < 8 && x >= 0 && y >= 0) && (board_map[x][y]=== other_tile) ){
+            //println("Considering direction " + directions[i][1] + " " + directions[i][0]);
+             while(board_map[x][y]===other_tile && on_board === 1 ){
+                 //println("Traverse while loop " + y +" "+ x + " " + board_map[x][y]);
+                 x+=stepx;
+                 //println("here1");
+                 y+=stepy;
+                 //println("here2 "  + on_board);
+                 //println(y +" "+ x + " board " + board_map[x][y]);
+                 //println(y +" "+ x);
+                 if( x>=8 || y>= 8 || x < 0 || y < 0){
+                        on_board=0;
+                        x=startx;
+                        y=starty;
+                 }
+             }
+             if( on_board === 0 ){
+                 
+             }
+             if(on_board ===1){
+                if(board_map[x][y] === my_tile){
+                 //println("Found flips ");
+                 while(x!==startx || y !== starty){
+                     //println("final while loop " + i);
+                     x-=stepx;
+                     y-=stepy;
+                     tiles_flipped.push([y],[x]);
+                   }
+                   
+             }
+             }
+        }
+    }
+    
+    //board_map[startx][starty] = -1;
+    //println("Result = " + tiles_flipped);
+    if(tiles_flipped.length ===0){
+        return 0;
+    }
+    else{
+        return tiles_flipped;
+    }
+};
+
+
+var a_find_best_move = function ( start_boardmap, player , levels){
+    var tree = [];
+    var my_tile;
+    var a_player = player;
+    var other_tile;
+    var other_player;
+    for( var i=0;i<levels;i++){
+	    tree[i] = [];
+    }
+        
+   if(player === 1){
+	my_tile=1;
+	other_tile=0;
+   }
+
+    else{
+    my_tile=0;
+	other_tile=1;
+     }
+	tree[0].push(new a_node());
+	tree[0][0].board = start_boardmap;
+	for(var i=0;i<8;i++){
+		for(var j=0;j<8;j++){
+			if(tree[0][0].board===1){
+				tree[0][0].score1+=1;
+			}
+			else if(tree[0][0].board===0){
+				tree[0][0].score0+=1;
+			}
+		}
+	}
+
+	  for(var i =0; i <levels;i++){ 
+		  if(i%2===0){
+			  a_player = my_tile;
+			  other_player = other_tile;
+		  }
+		  else{
+			  a_player = other_tile;
+			  other_player = my_tile;
+		  }
+	  for(var j=0;j<tree[i].length;j++){
+            for(var x=0;x<8;x++){
+                for(var y=0;y<8;y++){
+                    if(tree[i][j].board[x][y]!==1 && tree[i][j].board[x][y]!==0){
+                        if(x>=1 && x<=6 && y>=1 && y<=6){
+                        if(tree[i][j].board[x-1][y-1]=== other_player || tree[i][j].board[x-1][y]=== other_player || tree[i][j].board[x-1][y +1]=== other_player || tree[i][j].board[x][y-1]=== other_player ||tree[i][j].board[x][y+1]=== other_player ||tree[i][j].board[x+1][y-1]=== other_player ||tree[i][j].board[x+1][y]=== other_player ||tree[i][j].board[x+1][y-1]=== other_player ){
+                           var result = check_legal_move([y,x],a_player); 
+                           if(result ===0){}
+                           else{
+
+			       
+                               tree[i+1].push(new a_node()); 
+			       var index;
+			       
+			       index = tree[i+1].length;
+			       index-=1;
+			       tree[i][j].children.push = [i+1,index];
+			       tree[i+1][index].a_parent[0] = i;
+			       tree[i+1][index].a_parent[1] = j;
+			       tree[i+1][index].move = [x,y];
+
+			       if(i%2===0){
+                                   tree[i+1][index].type = 0; 
+			       }
+			       else{
+                                   tree[i+1][index].type = 1;
+			       }
+			       var temp = tree[i][j].board;
+                            for(var f=0;f<result.length;f+=2){
+                                temp[result[f+1]][result[f]] = a_player;
+                               }
+			       tree[i+1][index].board = temp;
+			       if(a_player === 1){
+				       tree[i+1][index].score1+=result.length;
+			       }
+			       else{
+				       tree[i+1][index].score0+=result.length;
+			       }
+
+                           }
+                           }
+                        }
+                        else{
+                           var result = check_legal_move([y,x],a_player); 
+                           if(result ===0){}
+                           else{
+			       
+                               tree[i+1].push(new a_node()); 
+			       var index;
+			       
+			       index = tree[i+1].length;
+			       index-=1;
+			       tree[i][j].children.push = [i+1,index];
+			       tree[i+1][index].a_parent[0] = i;
+			       tree[i+1][index].a_parent[1] = j;
+			       tree[i+1][index].move = [x,y];
+
+			       if(i%2===0){
+                                   tree[i+1][index].type = 0; 
+			       }
+			       else{
+                                   tree[i+1][index].type = 1;
+			       }
+			       var temp = tree[i][j].board;
+                            for(var f=0;f<result.length;f+=2){
+                                temp[result[f+1]][result[f]] = a_player;
+                               }
+			       tree[i+1][index].board = temp;
+			       if(a_player === 1){
+				       tree[i+1][index].score1+=result.length;
+			       }
+			       else{
+				       tree[i+1][index].score0+=result.length;
+			       }
+
+                           }                               
+                           }
+                    }
+                }
+            }
+	  }
+	  }
+    
+
+
+};
+
 var arrow =function(x,y,t){
     this.x=x;
     this.y=y;
@@ -248,8 +503,8 @@ var board_sample = function(x,y){
     this.x=x;
     this.y=y;
     this.a=0;
-    this.height = 100;
-    this.width = 100;
+    this.height = 300;
+    this.width = 300;
 };
 
 board_sample.prototype.draw = function() {
@@ -266,21 +521,28 @@ board_sample.prototype.draw = function() {
             //println("here");
             fill(4, 255, 0);
             stroke(0, 0, 0);
-            rect(-this.width/2 + 12.5*j,-this.height/2 + 12.5*i,12.5,12.5);
+            rect(-this.width/2 + 3*12.5*j,-this.height/2 + 3*12.5*i,3*12.5,3*12.5);
 
             if(board_map[i][j]===0){
                 fill(255,255,255);
-                ellipse(-this.width/2 + 7.25 +  12.5*j,-this.height/2 + 6.25 + 12.5*i,11,11);
+                ellipse(-this.width/2 + 7.25 +  3*12.5*j + 12,-this.height/2 + 13+ 6.25 + 3*12.5*i,25,25);
             }
             if(board_map[i][j]===1){
                 fill(0,0,0);
-                ellipse(-this.width/2 + 7.25 +  12.5*j,-this.height/2 + 6.25 + 12.5*i,11,11);
+                ellipse(-this.width/2 + 7.25 + 12 +  3*12.5*j,-this.height/2 + 13 + 6.25 + 3*12.5*i,25,25);
             }
+	    if(a_hint_board[i][j] === 3 && a_player === 0){
+                fill(255, 0, 0);
+                textSize(20);
+                text("X",-this.width/2 + 7.25 +  3*12.5*j + 12-5,-this.height/2 + 13+ 6.25 + 3*12.5*i -5,100,100);
+            }
+
         }
     }
 
     popMatrix();
 };
+
 
 var coin = function(x,y,t){
     this.x=x;
@@ -336,7 +598,7 @@ keyPressed = function(){
           if(arrow_array[0].y===110){
               game_vars.gamescreen1=1;
               game_vars.gamescreen2=0;
-              game_vars.startscreen=1;  // edit this
+              game_vars.startscreen=0;  // edit this
               game_vars.winscreen=0;
               game_vars.helpscreen = 0;
               game_vars.helpscreen_soccer = 0;
@@ -474,12 +736,27 @@ keyPressed = function(){
               game_vars.aboutscreen=0;
       }
     }
+    if((game_vars.gamescreen1 ===1 || game_vars.endscreen===1)  && enter === 0 ){
+      enter=1;
+      //println(40*keyArray[DOWN] - 40*keyArray[UP]);
+      if(keyArray[81]===1){
+              game_vars.gamescreen1=0;
+              game_vars.gamescreen2=0;
+              game_vars.startscreen=1;
+              game_vars.winscreen=0;
+              game_vars.helpscreen=0;
+              game_vars.helpscreen_soccer = 0;
+              game_vars.helpscreen_reversi = 0;
+              game_vars.aboutscreen=0;
+      }
+    }
 };
 
 keyReleased = function(){
   keyArray[keyCode]=0;
     keyPress = 0;
 };
+
 
 board = new board_sample(320,300);
 
@@ -490,8 +767,154 @@ coin_array.push( new coin(200,360,0));
 arrow_array.push( new arrow(100,110,1));
 arrow_array.push( new arrow(300,110,-1));
 
+a_player =1;
+mouseClicked = function(){
+    
+    if(game_vars.gamescreen1===1){
+        //println("PLayer is " + a_player + " " + a_h_player );
+        var other_player;
+        if(a_player===1){
+            other_player =0;
+        }
+        else{
+            other_player=1;
+        }
+        if(a_h_player === a_player){ 
+        if((a_player ===1 && a_valid_move_1===0) || (a_player ===0 && a_valid_move_0===0)){
+            a_no_move_h=1;
+            //println("No Move for player");
+            a_valid_move =1;
+        }
+        if(a_no_move_h!==1){
+            a_mouse_click[0] = floor(((mouseX - 83)/37));
+            a_mouse_click[1] = floor(((mouseY - 20)/37));
+            //println("Clicked :" + a_mouse_click);
+            a_valid_move =0;
+            if(board_map[a_mouse_click[1]][a_mouse_click[0]]!==1 &&  board_map[a_mouse_click[1]][a_mouse_click[0]]!==0){
+                //println("Checking");
+                var result = check_legal_move(a_mouse_click,a_player);
+                if(result === 0 ){
+                    //println("Bad Move");
+                }
+                else{
+                    //print("Right" + result);
+                    for(var i=0;i<result.length;i+=2){
+                        board_map[result[i+1]][result[i]] = a_player;
+                   a_valid_move =1;
+			
+                    }
+                }
+            }
+        }
+        if(a_player ===1 && a_valid_move === 1){
+            a_player = 0;
+        }
+        else if(a_valid_move === 1){
+            a_player= 1;
+        }
+        //println("here");
+    }
+        else{
+            //println(" Computer turn");
+	    //println(a_player + " " + other_player);
+            var move_value = [];
+            var best_x,best_y,best_val;
+            var best_result = [];
+            best_val=0;
+            for(var x=0;x<8;x++){
+                move_value[x]=[];
+                for(var y=0;y<8;y++){
+                    //println("Exploring Move " + x + " " + y + " ");
+                    if(board_map[x][y]!==1 && board_map[x][y]!==0){
+                        if(x>=1 && x<=6 && y>=1 && y<=6){
+                        if(board_map[x-1][y-1]=== other_player || board_map[x-1][y]=== other_player || board_map[x-1][y +1]=== other_player || board_map[x][y-1]=== other_player ||board_map[x][y+1]=== other_player ||board_map[x+1][y-1]=== other_player ||board_map[x+1][y]=== other_player ||board_map[x+1][y-1]=== other_player ){
+                           var result = check_legal_move([y,x],a_player); 
+                           if(result ===0){}
+                           else{
+                               move_value[x][y] = result.length;
+                               if(result.length>best_val){
+                                   best_val = result.length;
+                                   best_x = x;
+                                   best_y = y;
+                                   best_result = result;
+                               }
+                           }
+                           }
+                        }
+                        else{
+                           var result = check_legal_move([y,x],a_player); 
+                           if(result ===0){}
+                           else{
+                               move_value[x][y] = result.length;
+                               if(result.length>best_val){
+                                   best_val = result.length;
+                                   best_x = x;
+                                   best_y = y;
+                                   best_result = result;
+                               }
+                           //}
+                           }                               
+                           }
+                    }
+                }
+            }
+	    //println(best_result.length);
+            for(var i=0;i<best_result.length;i+=2){
+                board_map[best_result[i+1]][best_result[i]] = a_player;
+            }
+	    //println(a_player + " " + other_player);
+            a_player = other_player;
+	    //println(a_player + " " + other_player);
 
-/****** end reversi *************/
+        }
+        a_valid_move_0=0;
+	a_valid_move_1=0;	
+        a_result1=1;
+        a_result2=1;
+        for(var x = 0;x<8;x++){
+            for(var y =0;y<8;y++){
+		a_hint_board[x][y]=0;
+		        if(board_map[x][y]!==0 && board_map[x][y]!==1){
+                        a_result1 = check_legal_move([y,x],1);
+                        a_result2 = check_legal_move([y,x],0);
+                        if(a_result1 !== 0){
+                            a_valid_move_1=1;
+                        } 
+	                    if(a_result2 !== 0){
+		                    a_valid_move_0=1;
+				    a_hint_board[x][y]=3;
+                        } 
+		        }
+
+            }
+        }
+        //println(a_valid_move_1 + " " + a_valid_move_0);
+	if(a_valid_move_0 === 0 && a_valid_move_1 === 0){
+		a_game_over = 1;
+  game_vars.startscreen = 0;
+  game_vars.gamescreen1 = 0;
+  game_vars.endscreen1 = 1;
+  game_vars.gamescreen2 = 0;
+  game_vars.winscreen = 0;
+  game_vars.helpscreen = 0;
+  game_vars.helpscreen_soccer = 0;
+  game_vars.helpscreen_reversi = 0;
+  game_vars.aboutscreen=0;
+    a_final_board = get(0,0,400,400);
+		
+	}
+	//println("End of MouseClick");
+	
+        
+    }
+    else if(game_vars.gamescreen2 === 1){
+        user_X = mouseX;
+        user_Y = mouseY;
+    }
+
+};
+/*
+***** end reversi *************/
 
 
 var initializeSoccerCharacters = function(){
@@ -1059,7 +1482,7 @@ playerObj.prototype.chaseBall = function() {
 	    else{
 	        return;
 	    }
-        this.velocity.mult(0.5);
+        this.velocity.mult(1);
         this.position.add(this.velocity);
         if(this.velocity.y > 0){this.face = 1;}
         else{this.face = 0;}
@@ -1085,9 +1508,15 @@ playerObj.prototype.gohome = function(){
 	else{
 	    return;
 	}
-    this.velocity.mult(0.5);
-    this.position.add(this.velocity);
-    if(this.velocity.y > 0){this.face = 1;}
+    this.velocity.mult(1);
+    if(magnitude < 0.5){
+        this.velocity.x = 0;
+        this.velocity.y = 0;
+    }
+    else{
+        this.position.add(this.velocity);
+    }
+    if(this.velocity.y > 1){this.face = 1;}
     else{this.face = 0;}
         
     if(framerate < frameCount-5){
@@ -1115,7 +1544,7 @@ playerObj.prototype.chaseToIntercept = function() {
 	    else{
 	        return;
 	    }
-        this.velocity.mult(1);
+        this.velocity.mult(2);
         this.position.add(this.velocity);
     }
 };
@@ -1385,7 +1814,7 @@ var findPass = function(me, team){
                     score = score+10;
                 }
             }
-            println(score);
+            //println(score);
             if(score > bestscore){
                 bestscore = score;
                 bestarea = i;
@@ -1519,6 +1948,7 @@ defending.prototype.execute = function(team){
     }
     if (ball.inTransit === 1) {
         allPlayerStates[team.controlPlayer] = chaseToIntercept_num;
+        allPlayerStates[closestPlayer] = chaseToIntercept_num;
     }
     else{
         allPlayerStates[team.controlPlayer] = chaseBall_num;
@@ -1526,7 +1956,7 @@ defending.prototype.execute = function(team){
     if(ball.heldDefence(team) === 1){
         teamPossesion = team.number;
         team.changeState(attack_state);
-        allPlayerStates[team.controlPlayer] = wait_num;
+     //   allPlayerStates[team.controlPlayer] = wait_num;
     }
     
     for(var i=0;i<players.length; i++){
@@ -1537,8 +1967,6 @@ defending.prototype.execute = function(team){
 attacking.prototype.execute = function(team){
     var closestPlayer = 0;
     var palyerToPass = 0;
-    var bestPlayer_id = 0;
-    var bestPlayer = 0;
     closestPlayer = chooseClosestPlayer(team);
     
     if(team.number === 1 ){
@@ -1552,17 +1980,8 @@ attacking.prototype.execute = function(team){
       team.controlPlayer = closestPlayer;
     }
     
-    bestPlayer_id = chooseBestPlayerToPass(players[closestPlayer], team);
-    bestPlayer = players[bestPlayer_id];
-    
     if(ball.heldDefence(team) === 1){
-        target.set(bestPlayer.position);
-        ball.velocity = PVector.sub(target, ball.position);
-        ball.velocity.div(30);
-        ball.drag.set(ball.velocity.x, ball.velocity.y);
-        ball.drag.mult(-0.001);
-        allPlayerStates[bestPlayer_id] = receiveBall_num;
-        allPlayerStates[team.controlPlayer] = wait_num;
+        allPlayerStates[closestPlayer] = kickBall_num;
     }
     if(ball.heldAttack(team) === 1){
         team.changeState(defend_state);
@@ -1585,20 +2004,44 @@ kickoffState.prototype.execute = function(me){
     me.gohome();
 };
 waitState.prototype.execute  = function(me){
-   
+   me.gohome();
 };
 chaseBallState.prototype.execute  = function(me){
     if(teams[1].controlPlayer !== me.number){
         if(teams[me.team].currentState === 0){
             me.chaseBall();
         }
+        if(teams[me.team].controlPlayer !== me.number){
+             allPlayerStates[me.number] = wait_num; 
+        }
     }
 };
 receiveBallState.prototype.execute  = function(me){
-  
+    if(teams[me.team].currentState === 1){
+        me.chaseBall();
+    }
+    else{
+        allPlayerStates[me.number] = wait_num;
+    }
 };
 kickBallState.prototype.execute  = function(me){
+    var bestPlayer_id = 0;
+    var bestPlayer = 0;
+//    if(teams[1].controlPlayer !== me.number){ 
+        bestPlayer_id = chooseBestPlayerToPass(me, teams[me.team]);
+        bestPlayer = players[bestPlayer_id];
+            target.set(bestPlayer.position);
+//    }
+//  else{
+//        target.set(user_X, user_Y);
+//   }
+        ball.velocity = PVector.sub(target, ball.position);
+        ball.velocity.div(25);
+        ball.drag.set(ball.velocity.x, ball.velocity.y);
+        ball.drag.mult(-0.001);
     
+    allPlayerStates[me.number] = wait_num; 
+    allPlayerStates[bestPlayer_id] = receiveBall_num;
 };
 dribbleState.prototype.execute = function(me){
     
@@ -1609,8 +2052,46 @@ gaurdAttackerState.prototype.execute = function(me){
 chaseToInterceptState.prototype.execute  = function(me){
     if(teams[1].controlPlayer !== me.number){    
         if(teams[me.team].currentState === 0){
-            me.chaseToIntercept(); 
+            if(me.number === 0 || me.number === 1){
+                if(ball.position.y < 100){    
+                    me.chaseToIntercept();
+                    return;
+                }
+            }
+            if(me.number === 2 || me.number === 3){
+                if(ball.position.y < 200 && ball.position.y >=100){    
+                    me.chaseToIntercept();
+                    return;
+                }
+            }
+            if(me.number === 4 || me.number === 5){
+                if(ball.position.y >=200){    
+                    me.chaseToIntercept();
+                    return;
+                }
+            }
+            
+            if(me.number === 6 || me.number === 7){
+                if(ball.position.y > 300){    
+                    me.chaseToIntercept();
+                    return;
+                }
+            }
+            if(me.number === 8 || me.number === 9){
+                if(ball.position.y > 200 && ball.position.y <= 300){    
+                    me.chaseToIntercept();
+                    return;
+                }
+            }
+            if(me.number === 10 || me.number === 11){
+                if(ball.position.y < 200){    
+                    me.chaseToIntercept();
+                    return;
+                }
+            }
+            
         }
+        allPlayerStates[me.number] = wait_num;
     }
 };
 draw = function() {
@@ -1634,7 +2115,7 @@ draw = function() {
             }
         }
         startScreenAnimation();
-        board.draw();
+        image(board_image[0],250,250,140,140);
         arrow_array[0].draw();
         arrow_array[1].draw();
         coin_array[0].draw();
@@ -1785,9 +2266,10 @@ draw = function() {
         if(initialized === 0){
             initializeSoccerCharacters();
         }
+        fill(35, 69, 15);
         var f = createFont("Calibri");
         textFont(f, 15);
-        text("Press 'q' [LEFT] key to go back", 5, 380, 400, 300);
+        text("Press 'q'key to go back", 5, 380, 400, 300);
         
         for(var i=0; i<players.length; i++){
             players[i].draw();
@@ -1808,17 +2290,81 @@ draw = function() {
         controlPlayer_move(players[teams[1].controlPlayer]);
         ball.move();
         ball.draw();
+        fill(7, 230, 130);
+        text("Press 'q' to exit", 10, 380);
     }
     
+     if(game_vars.gamescreen1 === 1){
+       
+        pushMatrix();
+        background(76, 219, 224);
+        translate(-90,-130);
+        scale(1,1);
+        board.draw();
+        popMatrix();
+        var f = createFont("Bauhaus 93");
+        textFont(f, 15);
+        if(a_player === 1){
+            textSize(30);
+            fill(0, 0, 0);
+            text("Black's Turn.",20,335,300,300);
+            textSize(19);
+            text("Press mouse anywhere to see computer play.",10,360,440,300);
+        }       
+        else if(a_player === 0){
+            fill(255,255,255);
+            textSize(30);
+            text("White's Turn",20,335,300,300);
+            textSize(19);
+            text("Press mouse on a tile to play.",10,360,440,300); 
+        }
+        
+        fill(35, 69, 15);
+        var f = createFont("Calibri");
+        textFont(f, 15);
+        text("Press 'q' to exit", 15, 395);
+        
+    }
+    if(game_vars.endscreen1 === 1){
+        background(255, 0, 0);
+        background(255, 0, 0);
+        image(a_final_board,0,0,400,400);
+        textSize(30);
+        
+	    var score_1,score_0;
+        score_1=0;
+        score_0=0;
+	    for(var x=0;x<8;x++){
+		for(var y=0;y<8;y++){
+			if(board_map[x][y] === 1){
+				score_1+=1;
+			}
+			if(board_map[x][y] === 0){
+				score_0+=1;
+			}
+		}
+		fill(0,0,0,25);
+	    rect(0,0,400,400);
+	    fill(0, 251, 255);
+	    var f = createFont("Bauhaus 93");
+        textFont(f, 30);
+	    text("Game Over !",30,100,300,300);
+	    if(score_0 > score_1){
+		    text("White Won ",30,200,300,300);
+	    }
+	    else if(score_1 > score_0){
+		    text("Black Won ",30,200,300,300);
+	    }
+	    else if(score_1 === score_0){
+		    text("Draw",30,200,300,300);
+	    }
+        
+    }
     
-     //ball.draw(ball.position.x, ball.position.y);
-    /* player.draw();
-     
-     player.move();*/ 
-     
-     
-     
+    }
 };
+
+
 
 
 }};
