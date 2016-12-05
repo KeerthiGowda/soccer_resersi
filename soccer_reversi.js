@@ -2,7 +2,7 @@ var sketchProc=function(processingInstance){ with (processingInstance){
 size(400, 400); 
 
 frameRate(60);
-
+	
 translate(0,0);
 angleMode = "radian";
 var oneDegree = 3.14/180;
@@ -1776,7 +1776,6 @@ var chaseToInterceptState = function(){
 var playerObj = function(x, y, t, f, n,d){
     this.position = new PVector(x,y);
     this.baseposition = new PVector(x,y);
-    this.staticposition = new PVector(x,y);
     this.updatedPosition = new PVector(x,y);
     this.legs = 0;
     this.face = f;
@@ -1898,7 +1897,7 @@ ballObj.prototype.move = function() {
     }
     this.angle += this.aVelocity;
     
-    if (this.velocity.mag() < 0.1) {
+    if (this.velocity.mag() < 0.3) {
         this.inTransit = 0;
     }
     else {
@@ -2033,12 +2032,8 @@ playerObj.prototype.chaseBall = function() {
 	    }
         this.velocity.mult(chaseVelocityFactor);   // dribble change
         this.position.add(this.velocity);
-        if(this.velocity.y < 5){//this.face = 1;
-        
-            }
-        else{//this.face = 0;
-        
-            }
+        if(this.velocity.y > 0){this.face = 1;}
+        else{this.face = 0;}
         
         if(framerate < frameCount-5){
             framerate = frameCount;
@@ -2047,8 +2042,8 @@ playerObj.prototype.chaseBall = function() {
 };
 
 playerObj.prototype.gohome = function(){
-    var x = this.staticposition.x;
-    var y = this.staticposition.y;
+    var x = this.baseposition.x;
+    var y = this.baseposition.y;
     this.velocity.set(x - this.position.x, y - this.position.y);
         //this.velocity = PVector.div(this.velocity, this.velocity.mag());
         //var magnitude = abs(this.velocity.mag());
@@ -2061,21 +2056,18 @@ playerObj.prototype.gohome = function(){
 	else{
 	    return;
 	}
+    this.velocity.mult(1);
     if(magnitude < 0.5){
-        this.velocity.set(0);
+        this.velocity.x = 0;
+        this.velocity.y = 0;
     }
     else{
         this.velocity.mult(2);
         this.position.add(this.velocity);
     }
-    if(this.velocity.y > 0){
-        //this.face = 1;
-        
-    }
+    if(this.velocity.y > 1){this.face = 1;}
     
-    else{//this.face = 0;
-    
-    }
+    else{this.face = 0;}
         
     if(framerate < frameCount-5){
         framerate = frameCount;
@@ -2098,6 +2090,7 @@ playerObj.prototype.gotoUpdatedHome = function(){
 	else{
 	    return;
 	}
+    this.velocity.mult(1);
     if(magnitude < 0.5){
         this.velocity.x = 0;
         this.velocity.y = 0;
@@ -2105,14 +2098,8 @@ playerObj.prototype.gotoUpdatedHome = function(){
     else{
         this.position.add(this.velocity);
     }
-    if(this.velocity.y > 1){
-        //this.face = 1;
-        
-            }
-    else{
-        //this.face = 0;
-        
-    }
+    if(this.velocity.y > 1){this.face = 1;}
+    else{this.face = 0;}
         
     if(framerate < frameCount-5){
         framerate = frameCount;
@@ -2743,6 +2730,7 @@ attacking.prototype.execute = function(team){
     var closestPlayer = 0;
     var palyerToPass = 0;
     closestPlayer = chooseClosestPlayer(team);
+    
     if(team.number === 1 ){
         if(squaredDistance(players[team.controlPlayer].position, ball.position) > 2500){
             if(squaredDistance(players[team.controlPlayer].position, players[closestPlayer].position) > 2500){
@@ -2810,6 +2798,7 @@ prepareToKickoff.prototype.execute = function(){
         teams[0].changeState(attack_state);
     }
     ball.velocity.set(0);
+
 };
 /****************end teamObj states executables *******/
 
@@ -2900,7 +2889,7 @@ dribbleState.prototype.execute = function(me){
         trgt = vec_normalize(trgt);
         trgt.set(PVector.div(trgt,2));
         ball.velocity.set(trgt);
-        ball.velocity.mult(4);
+        ball.velocity.mult(3);
         ball.drag.set(ball.velocity.x, ball.velocity.y);
         ball.drag.mult(-0.001);
         if(canScore(me) >=100){
@@ -3159,8 +3148,9 @@ draw = function() {
         textFont(f, 15);
         
        
-        for(var i=0; i<players.length; i++){
-            // for(var i=6; i<12; i++){
+        // for(var dwi=0; i<players.length; i++){
+            for(var i
+            =6; i<12; i++){
             players[i].draw();
              var currstate = players[i].currentState;
              players[i].state[currstate].execute(players[i]);
@@ -3172,12 +3162,12 @@ draw = function() {
         for(var i=0; i<teams.length; i++){
             teams[i].state[teams[i].currentState].execute(teams[i]);
         }
-        // for(var i=0; i<team0_attackingArea.length; i++){
-        //     rect(team0_attackingArea[i].x, team0_attackingArea[i].y,5,5);
-        // }
-        // for(var i=0; i<team1_attackingArea.length; i++){
-        //     rect(team1_attackingArea[i].x, team1_attackingArea[i].y,5,5);
-        // }
+        for(var i=0; i<team0_attackingArea.length; i++){
+            rect(team0_attackingArea[i].x, team0_attackingArea[i].y,5,5);
+        }
+        for(var i=0; i<team1_attackingArea.length; i++){
+            rect(team1_attackingArea[i].x, team1_attackingArea[i].y,5,5);
+        }
         ball.move();
         ball.draw();
         controlPlayer_move(players[teams[1].controlPlayer]);
