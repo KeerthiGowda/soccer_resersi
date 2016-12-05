@@ -1,6 +1,5 @@
 var sketchProc=function(processingInstance){ with (processingInstance){
 size(400, 400); 
-
 frameRate(60);
 	
 translate(0,0);
@@ -19,10 +18,7 @@ var initialized = 0;
 var keyPress = 0;
 var framerate = frameCount;
 var k_a=random(1500);
-var k_pass = 0;
-var k_timeout = 0;
 
-// arvind
 // arvind
 var enter =0;
 var light;
@@ -55,17 +51,13 @@ var a_valid_move_0 = 1;
 var a_valid_move_1 = 1;
 var a_final_board;
 var a_hint_board = [];
-var a_get_score = 0;
-var a_score_1,a_score_0;
-var a_last_flipped = 0 ;
-var a_difficulty = 0;
-var a_cx,a_cy,a_cz,a_angle,a_r;
-a_r = 200;
-a_cx = a_cz = a_cy = a_angle = 0;
-var a_elevation = -425;
-var p = createGraphics(400,400,P3D);
+for( var a_p=0;a_p<8;a_p++){
+    a_hint_board[a_p]=[];
+    for(var a_q=0;a_q<8;a_q++){
+        a_hint_board[a_p][a_q]=0;
+    }
+}
 
-var corners = [];
 var game_vars1 = function(){		// declaring variable which controls state of game
   this.startscreen = 1;
   this.gamescreen1 = 0;
@@ -76,8 +68,6 @@ var game_vars1 = function(){		// declaring variable which controls state of game
   this.helpscreen_soccer = 0;
   this.helpscreen_reversi = 0;
   this.aboutscreen=0;
-  this.optionscreen1 = 0;
-  this.goalScreen = 0;
 };
 
 /******* Reversi **********/
@@ -90,17 +80,8 @@ var a_node = function(){
 	this.move = [];
 	this.score0=0;
 	this.score1=1;
+	
 };
-
-
-for( var a_p=0;a_p<8;a_p++){
-    a_hint_board[a_p]=[];
-    for(var a_q=0;a_q<8;a_q++){
-        a_hint_board[a_p][a_q]=0;
-    }
-}
-
-
 for(i=0;i<8;i++){
     board_map[i]=[];
 }
@@ -109,57 +90,6 @@ board_map[4][4]=0;
 board_map[3][3]=0;
 board_map[4][3]=1;
 board_map[3][4]=1;
-
-var fitness = function(curr_board, curr_player,difficulty){
-
-var value;
-value = 0;
-var other_player;
-if(curr_player === 1){
-	other_player = 0;
-}
-else{
-	other_player = 1;
-}
-//println("Printing Board :");
-for(var i =0; i<8 ; i++){
-	for(var j = 0; j<8; j++){
-		//if(curr_board[i][j]===1 || curr_board[i][j] === 0){
-	//		print(curr_board[i][j]);
-		//}
-	//	else{
-		//	print("x");
-			
-	//	}
-		var pos_val=1;
-		if(i===0 || j === 0){
-			pos_val = 2;
-			if( (i===0 && j === 0 ) || (i===0 && j===7) || (j===0 && i === 7) || (i===7 && j === 7)){
-				pos_val=3;
-			}	
-			if( (i===1) || (j===6) || ( i === 6) || (j === 1)){
-				pos_val=-1;
-			}	
-			if( (i===2) || (j===5) || ( i === 5) || (j === 2)){
-				pos_val=2;
-			}	
-
-		}
-
-		if(curr_board[i][j] === curr_player){
-			value+=pos_val;
-		}
-		else if(curr_board[i][j] === other_player){
-			value-=1;
-		}
-	}
-//	println("");
-}
-//	println("Value : " + value );
-
-return value;
-
-};
 
 var draw1_board = function(){
     
@@ -262,7 +192,7 @@ board_map[3][4]=1;
 
 var game_vars = new game_vars1();
 
-var check_legal_move = function(move,player, board){
+var check_legal_move = function(move,player){
     //println("Function called");
     
     var tiles_flipped = [];
@@ -296,7 +226,7 @@ var check_legal_move = function(move,player, board){
         other_tile = 1;
     }
     
-    //board[startx][starty] = my_tile;
+    //board_map[startx][starty] = my_tile;
     
     ////println("before beginning of for loop");
     for(var i =0; i <8;i++){
@@ -309,17 +239,17 @@ var check_legal_move = function(move,player, board){
         x+=stepx;
         y+=stepy;
         //println("outer For loop " + i + " Direction " + directions[i][1] + " " + directions[i][0] + " starting x y " + x + " " + y + " " + other_tile);
-        //println(board[x][y]=== other_tile);
-        //println((x<8 && y < 8 && x > 0 && y > 0)&&(board[x][y]=== other_tile));
-        if((x<8 && y < 8 && x >= 0 && y >= 0) && (board[x][y]=== other_tile) ){
+        //println(board_map[x][y]=== other_tile);
+        //println((x<8 && y < 8 && x > 0 && y > 0)&&(board_map[x][y]=== other_tile));
+        if((x<8 && y < 8 && x >= 0 && y >= 0) && (board_map[x][y]=== other_tile) ){
             //println("Considering direction " + directions[i][1] + " " + directions[i][0]);
-             while(board[x][y]===other_tile && on_board === 1 ){
-                 //println("Traverse while loop " + y +" "+ x + " " + board[x][y]);
+             while(board_map[x][y]===other_tile && on_board === 1 ){
+                 //println("Traverse while loop " + y +" "+ x + " " + board_map[x][y]);
                  x+=stepx;
                  //println("here1");
                  y+=stepy;
                  //println("here2 "  + on_board);
-                 //println(y +" "+ x + " board " + board[x][y]);
+                 //println(y +" "+ x + " board " + board_map[x][y]);
                  //println(y +" "+ x);
                  if( x>=8 || y>= 8 || x < 0 || y < 0){
                         on_board=0;
@@ -331,7 +261,7 @@ var check_legal_move = function(move,player, board){
                  
              }
              if(on_board ===1){
-                if(board[x][y] === my_tile){
+                if(board_map[x][y] === my_tile){
                  //println("Found flips ");
                  while(x!==startx || y !== starty){
                      //println("final while loop " + i);
@@ -357,15 +287,12 @@ var check_legal_move = function(move,player, board){
 
 
 var a_find_best_move = function ( start_boardmap, player , levels){
-
-
-// initializing stuff
     var tree = [];
     var my_tile;
     var a_player = player;
     var other_tile;
     var other_player;
-    for( var i=0;i<=levels;i++){
+    for( var i=0;i<levels;i++){
 	    tree[i] = [];
     }
         
@@ -379,31 +306,18 @@ var a_find_best_move = function ( start_boardmap, player , levels){
 	other_tile=1;
      }
 	tree[0].push(new a_node());
-	tree[0][0].board = [];
-       for(var g=0;g<8;g++){
-	       tree[0][0].board[g] = [];
-	       for(var h=0;h<8;h++){
-		       tree[0][0].board[g][h] = start_boardmap[g][h];
-		}
-	}
-	//println("Printing intial ");
-       for(var i=0;i<8;i++){
+	tree[0][0].board = start_boardmap;
+	for(var i=0;i<8;i++){
 		for(var j=0;j<8;j++){
-			//print(tree[0][0].board[i][j]);
-			if(tree[0][0].board[i][j]===1){
+			if(tree[0][0].board===1){
 				tree[0][0].score1+=1;
 			}
-			else if(tree[0][0].board[i][j]===0){
+			else if(tree[0][0].board===0){
 				tree[0][0].score0+=1;
 			}
 		}
-		//println("");
 	}
 
-
-// Building the tree
-//
-	//println(tree[0][0].board[3][3]);
 	  for(var i =0; i <levels;i++){ 
 		  if(i%2===0){
 			  a_player = my_tile;
@@ -413,102 +327,80 @@ var a_find_best_move = function ( start_boardmap, player , levels){
 			  a_player = other_tile;
 			  other_player = my_tile;
 		  }
-	   for(var j=0;j<tree[i].length;j++){
-        for(var x=0;x<8;x++){
-                  for(var y=0;y<8;y++){
-			//println(tree[0][0].board[3][3]);
-			//println("For : " + x +" " + y + " " )
-			//println(tree[i][j].board[x][y])
-
+	  for(var j=0;j<tree[i].length;j++){
+            for(var x=0;x<8;x++){
+                for(var y=0;y<8;y++){
                     if(tree[i][j].board[x][y]!==1 && tree[i][j].board[x][y]!==0){
                         if(x>=1 && x<=6 && y>=1 && y<=6){
-                        if(tree[i][j].board[x-1][y-1]=== other_player || tree[i][j].board[x-1][y]=== other_player || tree[i][j].board[x-1][y +1]=== other_player || tree[i][j].board[x][y-1]=== other_player ||tree[i][j].board[x][y+1]=== other_player ||tree[i][j].board[x+1][y-1]=== other_player ||tree[i][j].board[x+1][y]=== other_player ||tree[i][j].board[x+1][y+1]=== other_player ){
-                        //if(1===1){
-			   //println("Checking for " + x + " " + y);
-                           var result = check_legal_move([y,x],a_player,tree[i][j].board); 
+                        if(tree[i][j].board[x-1][y-1]=== other_player || tree[i][j].board[x-1][y]=== other_player || tree[i][j].board[x-1][y +1]=== other_player || tree[i][j].board[x][y-1]=== other_player ||tree[i][j].board[x][y+1]=== other_player ||tree[i][j].board[x+1][y-1]=== other_player ||tree[i][j].board[x+1][y]=== other_player ||tree[i][j].board[x+1][y-1]=== other_player ){
+                           var result = check_legal_move([y,x],a_player); 
                            if(result ===0){}
                            else{
 
-			      //println("Adding node to level : " + (i+1) + " for the position " + x + " " + y); 
+			       
                                tree[i+1].push(new a_node()); 
 			       var index;
 			       
 			       index = tree[i+1].length;
 			       index-=1;
-			       tree[i][j].children.push([i+1,index]);
+			       tree[i][j].children.push = [i+1,index];
 			       tree[i+1][index].a_parent[0] = i;
 			       tree[i+1][index].a_parent[1] = j;
-			       tree[i+1][index].move = result;
-			       tree[i+1][index].board = [];
-			       for(var g=0;g<8;g++){
-				       tree[i+1][index].board[g] = [];
-				       for(var h=0;h<8;h++){
-					       tree[i+1][index].board[g][h] = tree[i][j].board[g][h];
-					}
-				}
-			       for(var b=0;b<result.length;b+=2){
-				       tree[i+1][index].board[result[b+1]][result[b]] = a_player;
+			       tree[i+1][index].move = [x,y];
 
-			       }
-
-			       if((i+1)%2===0){
+			       if(i%2===0){
                                    tree[i+1][index].type = 0; 
 			       }
 			       else{
                                    tree[i+1][index].type = 1;
 			       }
+			       var temp = tree[i][j].board;
+                            for(var f=0;f<result.length;f+=2){
+                                temp[result[f+1]][result[f]] = a_player;
+                               }
+			       tree[i+1][index].board = temp;
 			       if(a_player === 1){
 				       tree[i+1][index].score1+=result.length;
-				       tree[i+1][index].score0-=result.length - 1;
 			       }
 			       else{
 				       tree[i+1][index].score0+=result.length;
-				       tree[i+1][index].score1-=result.length - 1;
 			       }
 
                            }
                            }
                         }
                         else{
-                           var result = check_legal_move([y,x],a_player,tree[i][j].board); 
+                           var result = check_legal_move([y,x],a_player); 
                            if(result ===0){}
                            else{
 			       
-			      //println("Adding node to level : " + (i+1) + " for the position " + x + " " + y); 
                                tree[i+1].push(new a_node()); 
 			       var index;
 			       
 			       index = tree[i+1].length;
 			       index-=1;
-			       tree[i][j].children.push([i+1,index]);
+			       tree[i][j].children.push = [i+1,index];
 			       tree[i+1][index].a_parent[0] = i;
 			       tree[i+1][index].a_parent[1] = j;
-			       tree[i+1][index].move = result;
-			       tree[i+1][index].board = [];
-			       for(var g=0;g<8;g++){
-				       tree[i+1][index].board[g] = [];
-				       for(var h=0;h<8;h++){
-					       tree[i+1][index].board[g][h] = tree[i][j].board[g][h];
-					}
-				}
-			       for(var b=0;b<result.length;b+=2){
-				       tree[i+1][index].board[result[b+1]][result[b]] = a_player;
+			       tree[i+1][index].move = [x,y];
 
-			       }
-
-			       if((i+1)%2===0){
+			       if(i%2===0){
                                    tree[i+1][index].type = 0; 
 			       }
 			       else{
                                    tree[i+1][index].type = 1;
 			       }
+			       var temp = tree[i][j].board;
+                            for(var f=0;f<result.length;f+=2){
+                                temp[result[f+1]][result[f]] = a_player;
+                               }
+			       tree[i+1][index].board = temp;
 			       if(a_player === 1){
 				       tree[i+1][index].score1+=result.length;
 			       }
 			       else{
 				       tree[i+1][index].score0+=result.length;
 			       }
-
 
                            }                               
                            }
@@ -519,57 +411,6 @@ var a_find_best_move = function ( start_boardmap, player , levels){
 	  }
     
 
-// Starting alpha beta
-var curr_level = levels;
-var best_board, best_result;
-while(tree[0][0].visit === 0){
-	for( var i = 0; i < tree[curr_level].length ; i++){
-	//	println("Checking for levl: " + curr_level + " and node :" + i);
-		if(tree[curr_level][i].children.length === 0){
-			tree[curr_level][i].value = fitness(tree[curr_level][i].board,player,0);
-			//tree[curr_level][i].value = tree[curr_level][i].score1 - tree[curr_level][i].score0;
-		//	println("Value for Node " + curr_level + " " + i + " : " + tree[curr_level][i].value);
-		}
-		else{
-			if(tree[curr_level][i].type === 0){
-				tree[curr_level][i].value = -10000;
-				for( var j = 0; j < tree[curr_level][i].children.length ; j++){
-					if(tree[tree[curr_level][i].children[j][0]][tree[curr_level][i].children[j][1]].value > tree[curr_level][i].value){
-						tree[curr_level][i].value =tree[tree[curr_level][i].children[j][0]][tree[curr_level][i].children[j][1]].value; 
-						if(curr_level === 0 && i === 0){
-							best_board = tree[tree[curr_level][i].children[j][0]][tree[curr_level][i].children[j][1]].board;
-							best_result = tree[tree[curr_level][i].children[j][0]][tree[curr_level][i].children[j][1]].move;
-						//	println("Assigning Final value" + best_result);
-						}
-					}	
-				}
-			}
-			if(tree[curr_level][i].type === 1){
-				tree[curr_level][i].value = 10000;
-				for( var j = 0; j < tree[curr_level][i].children.length ; j++){
-					if(tree[tree[curr_level][i].children[j][0]][tree[curr_level][i].children[j][1]].value < tree[curr_level][i].value){
-						tree[curr_level][i].value =tree[tree[curr_level][i].children[j][0]][tree[curr_level][i].children[j][1]].value; 
-					}	
-				}
-			}
-
-		}
-	tree[curr_level][i].visit = 1;
-	}
-	curr_level-=1;
-}
-
-//for(var k=0;k<levels+1;k++){
-//print("Level " + k + ":");
-//for(var j=0;j<tree[k].length;j++){
-//print(tree[k][j].value + " ");
-//}
-//println(" ");
-//}
-
-
-//println("Returning " + best_result);
-return best_result;
 
 };
 
@@ -674,21 +515,11 @@ board_sample.prototype.draw = function() {
     rect(-this.width/2-10,-this.height/2-10,this.width+20,this.height+20);
     fill(0, 255, 51);
     rect(-this.width/2,-this.height/2,this.width,this.height);
-        if(a_last_flipped){
-		   //println(a_last_flipped.length);
-        for(i=0;i<a_last_flipped.length;i=i+2){
-		    fill(255,255,0);
-		    rect(-this.width/2 + 7.25 + 12 +  3*12.5*a_last_flipped[i] - 25/2,-this.height/2 + 13 + 6.25 + 3*12.5*a_last_flipped[i+1] - 25/2,25,25);
-		    //rect(0,0,25,25);
-	    }
-	   }
-
     for(i=0;i<8;i++){
         for(j=0;j<8;j++){
             
             //println("here");
             fill(4, 255, 0);
-            //noFill();
             stroke(0, 0, 0);
             rect(-this.width/2 + 3*12.5*j,-this.height/2 + 3*12.5*i,3*12.5,3*12.5);
 
@@ -700,7 +531,7 @@ board_sample.prototype.draw = function() {
                 fill(0,0,0);
                 ellipse(-this.width/2 + 7.25 + 12 +  3*12.5*j,-this.height/2 + 13 + 6.25 + 3*12.5*i,25,25);
             }
-	    if(a_hint_board[i][j] === 3 && a_player === a_h_player){
+	    if(a_hint_board[i][j] === 3 && a_player === 0){
                 fill(255, 0, 0);
                 textSize(20);
                 text("X",-this.width/2 + 7.25 +  3*12.5*j + 12-5,-this.height/2 + 13+ 6.25 + 3*12.5*i -5,100,100);
@@ -755,30 +586,6 @@ coin.prototype.update = function(){
     
 };
 
-var a_reset_game = function(){
-        a_final_board = get(0,0,400,400);
-
-		for( var a_p=0;a_p<8;a_p++){
-		    a_hint_board[a_p]=[];
-		    for(var a_q=0;a_q<8;a_q++){
-		        a_hint_board[a_p][a_q]=0;
-		    }
-		}
-		
-		
-		for(i=0;i<8;i++){
-		    board_map[i]=[];
-		}
-		
-		board_map[4][4]=0;
-		board_map[3][3]=0;
-		board_map[4][3]=1;
-		board_map[3][4]=1;
-		a_last_flipped = 0;
-		a_player =1;
-
-};
-
 keyPressed = function(){
   enter=0;
   keyPress = 1;
@@ -789,9 +596,7 @@ keyPressed = function(){
       arrow_array[1].y+=40*keyArray[DOWN] - 40*keyArray[UP] ;
       if(keyArray[10]===1){
           if(arrow_array[0].y===110){
-	           a_reset_game();
-              game_vars.optionscreen1=1;
-              game_vars.gamescreen1=0;
+              game_vars.gamescreen1=1;
               game_vars.gamescreen2=0;
               game_vars.startscreen=0;  // edit this
               game_vars.winscreen=0;
@@ -917,33 +722,6 @@ keyPressed = function(){
       }
     }
     
-    if(game_vars.optionscreen1 ===1 && enter === 0 ){
-      enter=1;
-      //println(40*keyArray[DOWN] - 40*keyArray[UP]);
-      if(keyArray[10]===1){
-              game_vars.gamescreen1=1;
-	      game_vars.optionscreen1=0;
-              game_vars.gamescreen2=0;
-              game_vars.startscreen=0;
-              game_vars.winscreen=0;
-              game_vars.helpscreen=0;
-              game_vars.helpscreen_soccer = 0;
-              game_vars.helpscreen_reversi = 0;
-              game_vars.aboutscreen=0;
-      }
-      if(keyArray[81]===1){
-              game_vars.gamescreen1=0;
-	      game_vars.optionscreen1=0;
-              game_vars.gamescreen2=0;
-              game_vars.startscreen=1;
-              game_vars.winscreen=0;
-              game_vars.helpscreen=0;
-              game_vars.helpscreen_soccer = 0;
-              game_vars.helpscreen_reversi = 0;
-              game_vars.aboutscreen=0;
-      }
-    }
-    
     if(game_vars.gamescreen2 ===1 && enter === 0 ){
       enter=1;
       //println(40*keyArray[DOWN] - 40*keyArray[UP]);
@@ -958,7 +736,7 @@ keyPressed = function(){
               game_vars.aboutscreen=0;
       }
     }
-    if((game_vars.gamescreen1 ===1 || game_vars.endscreen1===1)  && enter === 0 ){
+    if((game_vars.gamescreen1 ===1 || game_vars.endscreen===1)  && enter === 0 ){
       enter=1;
       //println(40*keyArray[DOWN] - 40*keyArray[UP]);
       if(keyArray[81]===1){
@@ -971,34 +749,12 @@ keyPressed = function(){
               game_vars.helpscreen_reversi = 0;
               game_vars.aboutscreen=0;
       }
-    if(keyCode === 90){
-        a_r-=2;
-    }
-    if(keyCode === 88){
-        a_r+=2;
-    }
-    if(keyCode === UP){
-        if(a_elevation<400){
-            a_elevation = a_elevation - 3;
-        }
-    }
-    if(keyCode === DOWN){
-        if(a_elevation>-700){
-            a_elevation = a_elevation + 3;
-        }
-    }
-
     }
 };
 
 keyReleased = function(){
   keyArray[keyCode]=0;
     keyPress = 0;
-   a_r = 200;
-   a_cx = a_cz = a_cy = a_angle = 0;
-
-    a_elevation = -425;
-    
 };
 
 
@@ -1011,195 +767,9 @@ coin_array.push( new coin(200,360,0));
 arrow_array.push( new arrow(100,110,1));
 arrow_array.push( new arrow(300,110,-1));
 
-mouseDragged = function(){
-    if(1===1){
-        
-    if(mouseY>200){
-    //println(cz);println(200-cx/(200-cz));
-    a_angle = atan((200 - mouseX)/(200 - mouseY));
-    //angle-=90;
-    //if(pmouseX - mouseX > 0){
-        //angle=angle*-1;
-    //}
-
-    //println("Angle " + angle);
-    //println("CX " + cx);
-    //println("CZ " + cz);
-    }
-    else{
-            //println(cz);println(200-cx/(200-cz));
-    a_angle = atan((200 - mouseX)/(200 - mouseY));
-    a_angle-=PI;
-    //if(pmouseX - mouseX > 0){
-        //angle=angle*-1;
-    //}
-    //println("Angle " + angle);
-    //println("CX " + cx);
-    //println("CZ " + cz);
-    }
-
-    }
-
-};
-
-var draw_c = function(t){
-this.sides = 10;
-this.radius = 20;
-this.angle = 2*PI/this.sides;
-p.beginShape();
-if(t===1){
-    p.fill(0, 0, 0);
-}
-else if(t===0){
-    p.fill(255, 255, 255);
-}
-if(t!==2){
-for( var i=0;i<this.sides;i++){
-    var x = this.radius*sin(this.angle * i);
-    var z = this.radius*cos(this.angle * i);
-    p.vertex(x,-40,z);
-}
-p.endShape();
-p.beginShape();
-for( var i=0;i<this.sides;i++){
-    var x = this.radius*sin(this.angle * i);
-    var z = this.radius*cos(this.angle * i);
-    p.vertex(x,-12,z);
-}
-p.endShape();
-//p.noStroke();
-p.beginShape(TRIANGLE_STRIP);
-for( var i=0;i<this.sides+1;i++){
-    var x = this.radius*sin(this.angle * i);
-    var z = this.radius*cos(this.angle * i);
-    p.vertex(x,-40,z);
-    p.vertex(x,-12,z);
-}
-
-p.endShape();
-p.stroke(0,0,0);
-}
-else{
-p.fill(255,255,0,150);
-p.beginShape();
-p.vertex(-25,-12,-25);
-p.vertex(25,-12,-25);
-p.vertex(25,-12,25);
-p.vertex(-25,-12,25);
-p.endShape();
-}
-
-};
-
-
-var drawboard = function(){
-    
-    p.beginDraw();
-    p.beginCamera();
-    p.stroke(0,0,0);
-    //p.lights();
-    a_cx = sin(a_angle)*a_r;  // computing the x and z coordinates of the camera
-    a_cz = cos(a_angle)*a_r;
-
-    p.camera(a_cx,-100 + a_elevation,a_cz,0,0,0,0,1,0);
-    p.background(5, 255, 255);
-    p.beginShape();
-    p.fill(0, 255, 0);
-    //p.emissive(0,50,0);
-    p.vertex(-220,-11,-220);
-    corners.push([-220,-100,-200]);
-    p.vertex(-220,-11,220);
-    corners.push([-220,-100,200]);
-    p.vertex(220,-11,220);
-    corners.push([220,-100,200]);
-    p.vertex(220,-11,-220);
-    corners.push([220,-100,-200]);
-    p.endShape();
-    p.pushMatrix();
-    p.strokeWeight(15);
-    for(var i =0;i<7;i++){
-        p.line(-170+55*i,-11,-220,-170 + 55*i,-11,220);
-    }
-    for(var i =0;i<7;i++){
-        p.line(-220,-11,-170+55*i,220,-11,-170 + 55*i);
-    }
-    //p.noStroke();
-    for(var i=0;i<8;i++){
-        for(var j =0;j<8;j++){
-             p.pushMatrix();
-             p.translate(map(i,0,7,-200,190),0,map(j,0,7,-200,190));
-             if(a_hint_board[i][j] === 3 && a_player === a_h_player){
-			    //p.emissive(255,255,0);
-			    draw_c(2);
-            }
- 
-            if(board_map[i][j] === 1){
-                //println("Here");
-                //p.emissive(0,0,0);
-                draw_c(1);
-            }
-            else if(board_map[i][j] === 0){
-                //p.emissive(150,150,150);
-                draw_c(0);
-            }
-            p.popMatrix();
-        }
-        
-    }
-   // p.emissive(0,0,0);
-   p.noStroke();
-   if(a_last_flipped){
-        for(var j =0;j<a_last_flipped.length;j=j+2){
-             p.pushMatrix();
-             p.translate(map(a_last_flipped[j+1],0,7,-200,190),0,map(a_last_flipped[j],0,7,-200,190));
-	     p.fill(255,0,0,100);
-	     p.sphere(30);
-            p.popMatrix();
-        }
-   }
-    
-    p.popMatrix();
-    p.fill(112, 11, 11);
-    p.box(500,20,500);
-    p.endCamera();
-    p.noLights();
-    p.endDraw();
-    image(p,0,0);
-    //println(a_elevation);
-};
-
-
-
 a_player =1;
 mouseClicked = function(){
-	
-	if(game_vars.gamescreen2===1)
-    {
-        k_timeout = frameCount;
-        k_pass = 1;   
-    }
-
-    if(game_vars.optionscreen1 === 1){
-    if(mouseX<200){
-        if(mouseX<100){
-		a_h_player = 0;
-	}
-	else{
-		a_h_player = 1;
-	}
-    }
-    else{
-	    if(mouseY<133){
-		    a_difficulty = 0;
-	    }
-	    else if(mouseY<266){
-	        a_difficulty = 1;
-	    }
-	    else{
-		    a_difficulty = 2;
-	    }
-    }
-    } 
+    
     if(game_vars.gamescreen1===1){
         //println("PLayer is " + a_player + " " + a_h_player );
         var other_player;
@@ -1218,38 +788,16 @@ mouseClicked = function(){
         if(a_no_move_h!==1){
             a_mouse_click[0] = floor(((mouseX - 83)/37));
             a_mouse_click[1] = floor(((mouseY - 20)/37));
-
-
-    if((mouseX>p.screenX(corners[0][0] + 30,corners[0][1],corners[0][2]) - 30 && mouseY>p.screenY(corners[0][0],corners[0][1],corners[0][2])) &&(mouseX<p.screenX(corners[0][0] + 480,corners[0][1],corners[0][2]) && mouseY<p.screenY(corners[0][0],corners[0][1],corners[0][2] + 440)) ){
-        //println("Clicked inside");
-        var x=0,i=0,y=0;
-        //println(
-        while(mouseY>p.screenY(corners[0][0] + 30,corners[0][1],corners[0][2] + map(i,0,7,0,330))){
-            i++;
-        }
-        a_mouse_click[0]=i-2;
-        i=0;
-        while(mouseX>p.screenX(corners[0][0] + 30 + map(i,0,7,0,330),corners[0][1],corners[0][2] + map(a_mouse_click[0],0,7,0,330))){
-            i++;
-            
-        }
-        
-        a_mouse_click[1] = i-1;
-        //println(a_mouse_click);
-    }
-
-
-
             //println("Clicked :" + a_mouse_click);
             a_valid_move =0;
             if(board_map[a_mouse_click[1]][a_mouse_click[0]]!==1 &&  board_map[a_mouse_click[1]][a_mouse_click[0]]!==0){
                 //println("Checking");
-                var result = check_legal_move(a_mouse_click,a_player,board_map);
+                var result = check_legal_move(a_mouse_click,a_player);
                 if(result === 0 ){
                     //println("Bad Move");
                 }
                 else{
-                    a_last_flipped = result;//print("Right" + result);
+                    //print("Right" + result);
                     for(var i=0;i<result.length;i+=2){
                         board_map[result[i+1]][result[i]] = a_player;
                    a_valid_move =1;
@@ -1273,8 +821,6 @@ mouseClicked = function(){
             var best_x,best_y,best_val;
             var best_result = [];
             best_val=0;
-	    if(a_difficulty === 0){
-		    //println("Difficult of 0");
             for(var x=0;x<8;x++){
                 move_value[x]=[];
                 for(var y=0;y<8;y++){
@@ -1282,7 +828,7 @@ mouseClicked = function(){
                     if(board_map[x][y]!==1 && board_map[x][y]!==0){
                         if(x>=1 && x<=6 && y>=1 && y<=6){
                         if(board_map[x-1][y-1]=== other_player || board_map[x-1][y]=== other_player || board_map[x-1][y +1]=== other_player || board_map[x][y-1]=== other_player ||board_map[x][y+1]=== other_player ||board_map[x+1][y-1]=== other_player ||board_map[x+1][y]=== other_player ||board_map[x+1][y-1]=== other_player ){
-                           var result = check_legal_move([y,x],a_player,board_map); 
+                           var result = check_legal_move([y,x],a_player); 
                            if(result ===0){}
                            else{
                                move_value[x][y] = result.length;
@@ -1296,7 +842,7 @@ mouseClicked = function(){
                            }
                         }
                         else{
-                           var result = check_legal_move([y,x],a_player,board_map); 
+                           var result = check_legal_move([y,x],a_player); 
                            if(result ===0){}
                            else{
                                move_value[x][y] = result.length;
@@ -1312,32 +858,10 @@ mouseClicked = function(){
                     }
                 }
             }
-            }
 	    //println(best_result.length);
-	     var multi;
-	    if(a_difficulty === 2){
-	    multi = a_find_best_move(board_map, a_player, 5);
-	    }
-	    if(a_difficulty === 1){
-	    multi = a_find_best_move(board_map, a_player, 1);
-	    }
-	    //var a_find_best_move = function ( start_boardmap, player , levels){
-	    //println("Look ahead move " + multi); 
-	    //
-            //for(var i=0;i<best_result.length;i+=2){
-	    if(a_difficulty !== 0){
-		    a_last_flipped = multi;
-            for(var i=0;i<multi.length;i+=2){
-                //board_map[best_result[i+1]][best_result[i]] = a_player;
-                board_map[multi[i+1]][multi[i]] = a_player;
-		
-            }
-	    }
-	    else{
             for(var i=0;i<best_result.length;i+=2){
                 board_map[best_result[i+1]][best_result[i]] = a_player;
             }
-	    }
 	    //println(a_player + " " + other_player);
             a_player = other_player;
 	    //println(a_player + " " + other_player);
@@ -1351,19 +875,14 @@ mouseClicked = function(){
             for(var y =0;y<8;y++){
 		a_hint_board[x][y]=0;
 		        if(board_map[x][y]!==0 && board_map[x][y]!==1){
-                        a_result1 = check_legal_move([y,x],1,board_map);
-                        a_result2 = check_legal_move([y,x],0,board_map);
+                        a_result1 = check_legal_move([y,x],1);
+                        a_result2 = check_legal_move([y,x],0);
                         if(a_result1 !== 0){
                             a_valid_move_1=1;
-			    if(a_h_player === 1){
-		            a_hint_board[x][y]=3;
-			    }
                         } 
-	                if(a_result2 !== 0){
-		            a_valid_move_0=1;
-			    if(a_h_player === 0){
-			        a_hint_board[x][y]=3;
-                            } 
+	                    if(a_result2 !== 0){
+		                    a_valid_move_0=1;
+				    a_hint_board[x][y]=3;
                         } 
 		        }
 
@@ -1371,18 +890,17 @@ mouseClicked = function(){
         }
         //println(a_valid_move_1 + " " + a_valid_move_0);
 	if(a_valid_move_0 === 0 && a_valid_move_1 === 0){
-	    a_final_board = get(0,0,400,400);
 		a_game_over = 1;
-        game_vars.startscreen = 0;
-        game_vars.gamescreen1 = 0;
-        game_vars.endscreen1 = 1;
-        game_vars.gamescreen2 = 0;
-        game_vars.winscreen = 0;
-        game_vars.helpscreen = 0;
-        game_vars.helpscreen_soccer = 0;
-        game_vars.helpscreen_reversi = 0;
-        game_vars.aboutscreen=0;
-        drawboard();
+  game_vars.startscreen = 0;
+  game_vars.gamescreen1 = 0;
+  game_vars.endscreen1 = 1;
+  game_vars.gamescreen2 = 0;
+  game_vars.winscreen = 0;
+  game_vars.helpscreen = 0;
+  game_vars.helpscreen_soccer = 0;
+  game_vars.helpscreen_reversi = 0;
+  game_vars.aboutscreen=0;
+    a_final_board = get(0,0,400,400);
 		
 	}
 	//println("End of MouseClick");
@@ -1395,18 +913,8 @@ mouseClicked = function(){
     }
 
 };
-
-mouseReleased = function(){
-    
-    if(k_timeout-60 < frameCount){
-        
-    }
-    a_r = 200;
-a_cx = a_cz = a_cy = a_angle = 0;
-
-a_elevation = -425;
-};
-/***** end reversi *************/
+/*
+***** end reversi *************/
 
 
 var initializeSoccerCharacters = function(){
@@ -1734,7 +1242,7 @@ var ballObj = function(x, y){
 
 var defend_state = 0;
 var attack_state = 1;
-var prepareToKickoff_state = 2;
+var prepareToKickoff = 2;
 var defending = function(){
 };
 var attacking = function(){
@@ -1776,14 +1284,13 @@ var chaseToInterceptState = function(){
 var playerObj = function(x, y, t, f, n,d){
     this.position = new PVector(x,y);
     this.baseposition = new PVector(x,y);
-    this.updatedPosition = new PVector(x,y);
     this.legs = 0;
     this.face = f;
     this.velocity = new PVector(0, 0);
     this.team = t;
     this.state = [new kickoffState(),new waitState(), new chaseBallState(), new receiveBallState(), new kickBallState(), new dribbleState(), new gaurdAttackerState(), new chaseToInterceptState()];
     
-    this.currentState = 0;
+    this.currentstate = 0;
     this.number = n;
     this.defenceIntelligence = 0;
     // Add description features to this player
@@ -1854,10 +1361,6 @@ var frame_Start = frameCount;
 var initialScale = 1;
 var initialPlayer = new playerObj(-5, 100);
 var allPlayerStates = [0,0,0,0,0,0,0,0,0,0,0,0];
-
-var chaseVelocityFactor = 2;
-var chaseToIntercept_velocityFactor = 4;
-var movePlayer_velocityFactor = 3;
 /************ End of all soccer game variables ********/
 
 /******************ballObj***********************/
@@ -1921,31 +1424,15 @@ ballObj.prototype.move = function() {
             score0++;
         }
     } */
-    // if (this.position.y < -100) {
-    //     this.position.y = 200;
-    //     this.position.x = 200;
-    //     this.velocity.set(0, 0);
-    // }
-    // else if (this.position.y >= 500) {
-    //     this.position.y = 200;
-    //     this.position.x = 200;
-    //     this.velocity.set(0, 0);
-    // }
-    if (this.position.x < 25) {
-        this.position.x = 25;
+    if (this.position.y < 0) {
+        this.position.y = 0;
         this.velocity.set(0, 0);
     }
-    else if (this.position.x > 375) {
-        this.position.x = 375;
+    else if (this.position.y > 400) {
+        this.position.y = 400;
         this.velocity.set(0, 0);
     }
-};
-
-ballObj.prototype.heldMe = function(me) {
-    if (dist(this.position.x, this.position.y, me.position.x, me.position.y) < 5) {
-                return true;
-    }
-    return false;
+    
 };
 
 ballObj.prototype.heldAttack = function(team) {
@@ -1980,41 +1467,6 @@ teamObj.prototype.changeState = function(s){
 /*************** end teamObj***********************/
 
 /***************playerObj***********************/
-var k_coll = 0;
-var collision = function(me,ax1,ay1,ax2,ay2, bx1, by1, bx2, by2){
-    if( (ax2 >= bx1) && (ax1<=bx2)){
-        if( (ay2 >= by1) && (ay1<=by2)){
-            k_coll  =1;
-            // if(ax2 >= bx1 && ax1<bx1 ){
-            //     me.updatedPosition.x -=5;
-            // }
-            // if(ax1 <= bx2 && ax2>bx2){
-            //     me.updatedPosition.x +=5;
-            // }
-            
-            // if(ay2 >= by1 && ay1<by1){
-            //     me.updatedPosition.y -=5;
-            // }
-            // if(ay1 <= by2 && ay2>by2){
-            //     me.updatedPosition.y +=5;
-            // }
-            return true;
-        }
-    }
-    return false;
-};
-
-// var checkForCollision = function(){
-//   for(var i=0; i<players.length; i++){
-//       for(var j=0; j<players.length; j++){
-//           if(i !== j){
-//             collision(players[i], players[i].position.x, players[i].position.y, players[i].position.x+15,  players[i].position.y+35,players[j].position.x, players[j].position.y, players[j].position.x+15,  players[j].position.y+35);     
-//           }
-//       }
-//   }
-// };
-
-
 playerObj.prototype.chaseBall = function() {
         var x = ball.position.x + ball.velocity.x * 4;  // predict future position
         var y = ball.position.y + ball.velocity.y * 4;
@@ -2030,7 +1482,7 @@ playerObj.prototype.chaseBall = function() {
 	    else{
 	        return;
 	    }
-        this.velocity.mult(chaseVelocityFactor);   // dribble change
+        this.velocity.mult(1);
         this.position.add(this.velocity);
         if(this.velocity.y > 0){this.face = 1;}
         else{this.face = 0;}
@@ -2062,40 +1514,6 @@ playerObj.prototype.gohome = function(){
         this.velocity.y = 0;
     }
     else{
-        this.velocity.mult(2);
-        this.position.add(this.velocity);
-    }
-    if(this.velocity.y > 1){this.face = 1;}
-    
-    else{this.face = 0;}
-        
-    if(framerate < frameCount-5){
-        framerate = frameCount;
-        this.legs = (this.legs+1)%3;
-    }
-};
-
-playerObj.prototype.gotoUpdatedHome = function(){
-    var x = this.updatedPosition.x;
-    var y = this.updatedPosition.y;
-    this.velocity.set(x - this.position.x, y - this.position.y);
-        //this.velocity = PVector.div(this.velocity, this.velocity.mag());
-        //var magnitude = abs(this.velocity.mag());
-	var magnitude = sqrt(this.velocity.x * this.velocity.x + this.velocity.y * this.velocity.y);
-	
-	if(magnitude > 0){	
-        this.velocity.x =  this.velocity.x/magnitude;
-        this.velocity.y =  this.velocity.y/magnitude;
-	}
-	else{
-	    return;
-	}
-    this.velocity.mult(1);
-    if(magnitude < 0.5){
-        this.velocity.x = 0;
-        this.velocity.y = 0;
-    }
-    else{
         this.position.add(this.velocity);
     }
     if(this.velocity.y > 1){this.face = 1;}
@@ -2106,7 +1524,6 @@ playerObj.prototype.gotoUpdatedHome = function(){
         this.legs = (this.legs+1)%3;
     }
 };
-
 
 playerObj.prototype.chaseToIntercept = function() {
     if (ball.inTransit === 1) {
@@ -2127,40 +1544,23 @@ playerObj.prototype.chaseToIntercept = function() {
 	    else{
 	        return;
 	    }
-        this.velocity.mult(chaseToIntercept_velocityFactor);
+        this.velocity.mult(2);
         this.position.add(this.velocity);
     }
 };
 
 playerObj.prototype.changeState = function(s){
-    this.currentState = s;
+    this.currentstate = s;
 };
 
 playerObj.prototype.draw = function() {
-    //  checkForCollision();
-     
-     if(this.position.x < 25){
-         this.position.x = 25;
-     }
-     else if(this.position.x > 375){
-         this.position.x = 375;
-     }
-     
-     if(this.position.y < -100){
-         this.position.y = -100;
-     }
-     else if(this.position.y > 500){
-         this.position.y = 500;
-     }
-     
+
     if(this.face === 0){
-        
-       image(myImages[this.legs], this.position.x-7, this.position.y-30, 15, 35);
-       if((this.team === 1) && (teams[this.team].controlPlayer ===this.number)){
-           fill(0, 0, 0);
-            rect(this.position.x-4, this.position.y-16, 9,8);
+        if((this.team === 1) && (teams[this.team].controlPlayer ===this.number)){
+            text("Active", this.position.x-7, this.position.y-45);
         }
-      text(this.number, this.position.x-7, this.position.y-35);
+       image(myImages[this.legs], this.position.x-7, this.position.y-30, 15, 35);
+       text(this.number, this.position.x-7, this.position.y-35);
     }
     else{
        image(myImages[this.legs+3], this.position.x-7, this.position.y-30, 15, 35);
@@ -2177,19 +1577,19 @@ playerObj.prototype.draw = function() {
 var controlPlayer_move = function(me) {
     
     if(keyPress === 1){
-        if (keyArray[65] === 1) {
-            me.position.x-=movePlayer_velocityFactor;
+        if (keyArray[LEFT] === 1) {
+            me.position.x-=1;
             
         }
-        if (keyArray[68] === 1) {
-            me.position.x+=movePlayer_velocityFactor;
+        if (keyArray[RIGHT] === 1) {
+            me.position.x+=1;
         }
-        if (keyArray[87] === 1) {
-            me.position.y-=movePlayer_velocityFactor;
+        if (keyArray[UP] === 1) {
+            me.position.y-=1;
             me.face = 0;
         }
-        if (keyArray[83] === 1) {
-            me.position.y+=movePlayer_velocityFactor;
+        if (keyArray[DOWN] === 1) {
+            me.position.y+=1;
             me.face = 1;
         }  
         if(framerate < frameCount-5){
@@ -2236,20 +1636,6 @@ goalieObj.prototype.move = function() {
 /*****************end golie object***************/
 
 /*****************Common functions **************/
-var vec_normalize = function(vec){
-   
-  var magnitude = sqrt(vec.x * vec.x + vec.y * vec.y);
-		
-        if(magnitude > 0){	
-            vec.x =  vec.x/magnitude;
-            vec.y =  vec.y/magnitude;
-	    }
-	    else{
-	        return;
-	    }
-	    return vec;
-};
-
 var chooseClosestPlayer = function(team) {
     var bestPlayer = 0;
     var bestDist = 1000;
@@ -2315,32 +1701,6 @@ var safeToPass = function(player1, player2){
     return score;
 };
 
-var safeToPassArea = function(player1, area){
-    var angle =0;
-    var score = 100;
-    var vec1 = PVector.sub(player1.position, area);
-    var vec2 = 0;
-    for (var i = 0; i< players.length; i++) {
-        if ( players[i].team !== teamPossesion)   {
-            vec2 = PVector.sub(player1.position, players[i].position);
-            
-            angle = PVector.angleBetween(vec1,vec2) / oneDegree;
-            
-            if(angle > 180){ angle = 360-180 ;}
-            if(abs(angle) < 5){
-                score = score - 50;
-            }
-            else if(abs(angle) < 10){
-                score = score - 30;
-            }
-            else if(abs(angle) < 20){
-                score = score - 20;
-            }
-        }    
-    }
-    return score;
-};
-
 var chooseBestPlayerToPass = function(me,team){
     var bestPlayer = 0;
     var bestScore = 0;
@@ -2360,19 +1720,19 @@ var chooseBestPlayerToPass = function(me,team){
 
 var team0_attackingArea = [];
 var team1_attackingArea = [];
-for(var rows=0; rows<2; rows++){
+for(var rows=0; rows<4; rows++){
     var xStart = 0;
     var yStart = (rows*60);
     for(var columns=0; columns<4; columns++){
-        team1_attackingArea.push(new PVector(xStart+50, yStart+80-100));
+        team1_attackingArea.push(new PVector(xStart+50, yStart+20-100));
         xStart = xStart+100;
     }
 }
-for(var rows=0; rows<2; rows++){
+for(var rows=0; rows<4; rows++){
     var xStart = 0;
     var yStart = (rows*60);
     for(var columns=0; columns<4; columns++){
-        team0_attackingArea.push(new PVector(xStart+50, yStart+20+350));
+        team0_attackingArea.push(new PVector(xStart+50, yStart+20+300));
         xStart = xStart+100;
     }
 }
@@ -2391,101 +1751,76 @@ var findPass = function(me, team){
             var dist_goal = squaredDistance(team0_attackingArea[i], goal_0_center);
             if(dist_goal < 5000){ score = 100;}
             else { score = 80;}
-            var safe_for_me_to_pass = safeToPassArea(me, team0_attackingArea[i]);
+            
+            var safe_for_me_to_pass = safeToPass(me, team0_attackingArea[i]);
             score = score + safe_for_me_to_pass;
+            
+            for( var j=6; i<players.length; j++){  // Other team players
+                var distance= squaredDistance(players[j].position, team0_attackingArea[i]);
+                if(distance > 2500){    // 50 pixels
+                    score = score-50;
+                }
+                else if(distance > 5000){   // 70 pixels
+                    score = score-30;
+                }
+                else if(distance > 10000){   // 100 pixels
+                    score = score-10;
+                }
+            }
+            for( var j=1; i<players.length/2; j++){  // Our team players
+                var distance= squaredDistance(players[j].position, team0_attackingArea[i]);
+                if(distance < 2500){    // 50 pixels
+                    score = score + 50;
+                }
+                else if(distance < 5000){   // 70 pixels
+                    score = score+30;
+                }
+                else if(distance < 10000){   // 70 pixels
+                    score = score+10;
+                }
+            }
             if(score > bestscore){
                 bestscore = score;
                 bestarea = i;
             }
         }
     }
-    if(team.number === 1){
+    else if(team.number === 1){
         for(var i=0; i<team1_attackingArea.length; i++){
             var dist_goal = squaredDistance(team1_attackingArea[i], goal_1_center);
             if(dist_goal < 5000){ score = 100;}
             else { score = 80;}
-            var safe_for_me_to_pass = safeToPassArea(me, team1_attackingArea[i]);
-            score = score + safe_for_me_to_pass;
+            for( var j=6; j<players.length; j++){  // Other team players
+                var distance = squaredDistance(players[j].position, team1_attackingArea[i]);
+                if(distance > 2500){    // 50 pixels
+                    score = score-50;
+                }
+                else if(distance > 5000){   // 70 pixels
+                    score = score-30;
+                }
+                else if(distance > 10000){   // 100 pixels
+                    score = score-10;
+                }
+            }
+            for( var j=1; j<players.length/2; j++){  // Our team players
+                var distance= squaredDistance(players[j].position, team1_attackingArea[i]);
+                if(distance < 2500){    // 50 pixels
+                    score = score + 50;
+                }
+                else if(distance < 5000){   // 70 pixels
+                    score = score+30;
+                }
+                else if(distance < 10000){   // 70 pixels
+                    score = score+10;
+                }
+            }
+            //println(score);
             if(score > bestscore){
                 bestscore = score;
                 bestarea = i;
             }
         }
     }
-    //         var safe_for_me_to_pass = safeToPassArea(me, team0_attackingArea[i]);
-    //         score = score + safe_for_me_to_pass;
-            
-    //         for( var j=6; i<players.length; j++){  // Other team players
-    //             // var distance = 0;
-    //             //var distance= squaredDistance(players[j].position, team0_attackingArea[i]);
-    //             // if(distance > 2500){    // 50 pixels
-    //             //     score = score-50;
-    //             // }
-    //             // else if(distance > 5000){   // 70 pixels
-    //             //     score = score-30;
-    //             // }
-    //             // else if(distance > 10000){   // 100 pixels
-    //             //     score = score-10;
-    //             // }
-    //         }
-    //         for( var j=0; i<players.length/2; j++){  // Our team players
-    //             // var distance= squaredDistance(players[j].position, team0_attackingArea[i]);
-    //             // if(distance < 2500){    // 50 pixels
-    //             //     score = score + 50;
-    //             // }
-    //             // else if(distance < 5000){   // 70 pixels
-    //             //     score = score+30;
-    //             // }
-    //             // else if(distance < 10000){   // 70 pixels
-    //             //     score = score+10;
-    //             // }
-    //         } 
-    //         if(score > bestscore){
-    //             bestscore = score;
-    //             bestarea = i;
-    //         }
-    //     }
-    // }
-    // else if(team.number === 1){
-    //     for(var i=0; i<1; i++){
-    //         var dist_goal = squaredDistance(team1_attackingArea[i], goal_1_center);
-    //         if(dist_goal < 5000){ score = 100;}
-    //         else { score = 80;}
-            
-    //         var safe_for_me_to_pass = safeToPassArea(me, team0_attackingArea[i]);
-    //         score = score + safe_for_me_to_pass;
-            
-    //         for( var j=6; j<players.length; j++){  // Other team players
-    //             // var distance = squaredDistance(players[j].position, team1_attackingArea[i]);
-    //             // if(distance > 2500){    // 50 pixels
-    //             //     score = score-50;
-    //             // }
-    //             // else if(distance > 5000){   // 70 pixels
-    //             //     score = score-30;
-    //             // }
-    //             // else if(distance > 10000){   // 100 pixels
-    //             //     score = score-10;
-    //             // }
-    //         }
-    //         for( var j=0; j<players.length/2; j++){  // Our team players
-    //             // var distance= squaredDistance(players[j].position, team1_attackingArea[i]);
-    //             // if(distance < 2500){    // 50 pixels
-    //             //     score = score + 50;
-    //             // }
-    //             // else if(distance < 5000){   // 70 pixels
-    //             //     score = score+30;
-    //             // }
-    //             // else if(distance < 10000){   // 70 pixels
-    //             //     score = score+10;
-    //             // }
-    //         }
-    //         //println(score);
-    //         if(score > bestscore){
-    //             bestscore = score;
-    //             bestarea = i;
-    //         }
-    //     }
-    // }
     return bestarea;
     
 };
@@ -2566,18 +1901,6 @@ var canScore = function(me){
     return score;
 };
 
-var anyOppnentClosetoMe = function(me){
-    for (var i = 0; i< players.length; i++) {
-        if ( (i !== me.number) && (players[i].team !== me.team)) {
-            var d = squaredDistance(me.position, players[i].position);
-            if(d <2000){
-                return true;
-            }
-        }
-    }
-};
-
-
 var scoreKick = function() {
     var inGoal = 0;
     if (((target.x < 30) && (target.y > 100) && (target.y < 300)) ||
@@ -2592,7 +1915,7 @@ var startScreenAnimation = function(){
     initialPlayer.face= 1;
     pushMatrix();
     scale(initialScale);
-    translate(initialScale*2,0);
+    translate(initialScale*10,0);
     initialPlayer.draw();
     if(frame_Start < frameCount-10){
         initialScale = initialScale+0.1;
@@ -2605,91 +1928,6 @@ var startScreenAnimation = function(){
         initialPlayer.position.y = 100;
         initialScale = 1;
     }    
-};
-
-
-// var collision = function(ax1,ay1,ax2,ay2, bx1, by1, bx2, by2){
-//     if( (ax2 >= bx1) && (ax1<=bx2)){
-//         if( (ay2 >= by1) && (ay1<=by2)){
-//             //println("collision");
-//             return true;
-//         }
-//     }
-// };
-
-
-
-
-ballObj.prototype.moveWithPlayer = function(me){
-    // ball.position.x = me.position.x+10;
-    // ball.position.y = me.position.x+25;
-    // ball.move();
-    target.x = me.position.x +5 ;
-    target.y = me.position.y -5 ;
-        ball.velocity = PVector.sub(target, ball.position);
-        ball.velocity.div(1.5);
-        ball.drag.set(ball.velocity.x, ball.velocity.y);
-        ball.drag.mult(-0.001);
-};
-var runWithBall = function(me){
-  
-};
-
-var updateLocation = function(me){
-     var area  = findPass(me, teams[me.team]);
-     if(teams[0].currentState !== prepareToKickoff_state || teams[1].currentState !== prepareToKickoff_state){
-     if(me.team === 0){
-         if(me.number === 0 || me.number === 1){
-            
-         }
-         if(me.number === 2 ){
-            me.updatedPosition.y = 100;
-         }
-         if( me.number === 3){
-             if(ball.position.y > 200){
-                me.updatedPosition.y = ball.position.y;
-             }
-            else{
-                 me.updatedPosition = me.baseposition;
-             }
-         }
-         if(me.number === 4 || me.number === 5){
-             if(ball.position.y > 200){
-                 me.updatedPosition.x = team0_attackingArea[area].x;
-                 me.updatedPosition.y = ball.position.y+5;
-             }
-             else{
-                 me.updatedPosition = me.baseposition;
-             }
-         }
-     }
-     else{
-        if(me.number === 6 || me.number === 7){
-            
-         }
-         if(me.number === 8){
-             me.updatedPosition.y = 300;
-         }
-         if(me.number === 9){
-             if(ball.position.y < 200){
-                me.updatedPosition.y = ball.position.y;
-            }
-            else{
-                 me.updatedPosition = me.baseposition;
-             }
-         
-         }
-         if(me.number === 10 || me.number === 11){
-             if(ball.position.y < 200){
-                me.updatedPosition.x = team1_attackingArea[area].x;
-                me.updatedPosition.y = ball.position.y-5;
-         }
-         else{
-                 me.updatedPosition = me.baseposition;
-             }         
-         }
-     } 
-     }
 };
 
 /*****************End common functions ************/
@@ -2718,12 +1956,12 @@ defending.prototype.execute = function(team){
     if(ball.heldDefence(team) === 1){
         teamPossesion = team.number;
         team.changeState(attack_state);
+     //   allPlayerStates[team.controlPlayer] = wait_num;
     }
     
     for(var i=0;i<players.length; i++){
         players[i].changeState(allPlayerStates[i]);   
     }
-    
 };
 
 attacking.prototype.execute = function(team){
@@ -2741,39 +1979,9 @@ attacking.prototype.execute = function(team){
     else{
       team.controlPlayer = closestPlayer;
     }
-    if (ball.inTransit === 1) {
-        allPlayerStates[closestPlayer] = chaseBall_num;
-    }
+    
     if(ball.heldDefence(team) === 1){
-        
-        //allPlayerStates[closestPlayer] = kickBall_num;
-       // allPlayerStates[closestPlayer] = dribble_num;
-       
-       if(team.number === 1){
-           if(k_pass === 1){
-               allPlayerStates[closestPlayer] = kickBall_num;
-           }
-           else{
-               
-               if(!ball.heldMe(players[closestPlayer])){
-                   k_pass = 0;
-                    ball.moveWithPlayer(players[closestPlayer]);
-               }
-           }
-       }
-           
-       else{
-            if(anyOppnentClosetoMe(players[closestPlayer])){
-                allPlayerStates[closestPlayer] = kickBall_num;
-            }
-            else{
-                if(squaredDistance(players[closestPlayer].position, ball.position )< 50){
-                    allPlayerStates[closestPlayer] = chaseBall_num;
-                }
-                allPlayerStates[closestPlayer] = dribble_num;
-            }
-       }
-        
+        allPlayerStates[closestPlayer] = kickBall_num;
     }
     if(ball.heldAttack(team) === 1){
         team.changeState(defend_state);
@@ -2784,36 +1992,19 @@ attacking.prototype.execute = function(team){
     }
 };
 
-var kickofTime = 0;
 prepareToKickoff.prototype.execute = function(){
-    
     for(var i=0;i<players.length; i++){
-        allPlayerStates[i] = 0; 
+        players[i].changeState(kickoff_num);   
     }
-    for(var i=0;i<players.length; i++){
-        players[i].changeState(allPlayerStates[i]);   
-    }
-    if(kickofTime < frameCount -100){
-        teams[1].changeState(attack_state);
-        teams[0].changeState(attack_state);
-    }
-    ball.velocity.set(0);
-
 };
 /****************end teamObj states executables *******/
 
 /*****************PlayerObj executables ***********/
 kickoffState.prototype.execute = function(me){
     me.gohome();
-    
 };
 waitState.prototype.execute  = function(me){
-    if(teams[me.team].currentState === attack_state){
-        me.gotoUpdatedHome();
-    }
-    else{
-        me.gohome();
-    }
+   me.gohome();
 };
 chaseBallState.prototype.execute  = function(me){
     if(teams[1].controlPlayer !== me.number){
@@ -2833,31 +2024,9 @@ receiveBallState.prototype.execute  = function(me){
         allPlayerStates[me.number] = wait_num;
     }
 };
-
 kickBallState.prototype.execute  = function(me){
     var bestPlayer_id = 0;
     var bestPlayer = 0;
-    if(me.team === team1){
-        var tr = mouseY;
-        if(ball.position.y < 100){
-            tr =   mouseY + ball.position.y - 100;
-        }
-        else if(ball.position.y > 300 ){
-            tr = mouseY + ball.position.y - 300;
-        }
-        if(tr > 570)
-        { tr = 650;}
-        
-        if(tr < -70)
-        { tr = -200;}
-
-        target.set(mouseX, tr);
-        ball.velocity = PVector.sub(target, ball.position);
-        ball.velocity.div(20);
-        ball.drag.set(ball.velocity.x, ball.velocity.y);
-        ball.drag.mult(-0.001);
-    }
-    else{
 //    if(teams[1].controlPlayer !== me.number){ 
         bestPlayer_id = chooseBestPlayerToPass(me, teams[me.team]);
         bestPlayer = players[bestPlayer_id];
@@ -2866,40 +2035,17 @@ kickBallState.prototype.execute  = function(me){
 //  else{
 //        target.set(user_X, user_Y);
 //   }
-     
         ball.velocity = PVector.sub(target, ball.position);
         ball.velocity.div(25);
         ball.drag.set(ball.velocity.x, ball.velocity.y);
         ball.drag.mult(-0.001);
-     }
+    
     allPlayerStates[me.number] = wait_num; 
     allPlayerStates[bestPlayer_id] = receiveBall_num;
 };
-
 dribbleState.prototype.execute = function(me){
-    var trgt = 0;
-    me.chaseBall();
-    if(ball.heldMe(me)){
-        if(me.team === 1){
-            trgt = PVector.sub( goal_1_center,me.position);
-        }
-        else{
-            trgt = PVector.sub( goal_0_center,me.position);
-        }
-        trgt = vec_normalize(trgt);
-        trgt.set(PVector.div(trgt,2));
-        ball.velocity.set(trgt);
-        ball.velocity.mult(3);
-        ball.drag.set(ball.velocity.x, ball.velocity.y);
-        ball.drag.mult(-0.001);
-        if(canScore(me) >=100){
-            ball.velocity.mult(10);
-            allPlayerStates[me.number] = wait_num;
-        }
-        
-    }
+    
 };
-
 gaurdAttackerState.prototype.execute = function(me){
 };
 
@@ -2926,7 +2072,7 @@ chaseToInterceptState.prototype.execute  = function(me){
             }
             
             if(me.number === 6 || me.number === 7){
-                if(ball.position.y > 2500){    
+                if(ball.position.y > 300){    
                     me.chaseToIntercept();
                     return;
                 }
@@ -2945,22 +2091,9 @@ chaseToInterceptState.prototype.execute  = function(me){
             }
             
         }
-        if(teams[me.team].currentState === 1){
-            
-        }
         allPlayerStates[me.number] = wait_num;
     }
 };
-
-var goalTime;
-var checkForGoal = function(){
-  if(ball.position.y < -100 || ball.position.y > 500){
-      game_vars.gamescreen2 = 0;
-      game_vars.goalScreen = 1;
-      goalTime = frameCount;
-  }
-};
-
 draw = function() {
     
      if(game_vars.startscreen === 1 |  game_vars.gamescreen2===1 ){
@@ -3128,17 +2261,7 @@ draw = function() {
     }
     
     if(game_vars.gamescreen2===1 ){
-        
-        pushMatrix();
-        var tr = ball.position.y;
-        if(ball.position.y < 100){
-            if(ball.position.y < -100) { tr = -100;}
-             translate(0,100-tr);   
-        }
-        else if(ball.position.y > 300 ){
-            if(ball.position.y > 450) { tr = 450;}
-            translate(0,300-tr);
-        }
+        drawBackground();
         drawBackground();
         if(initialized === 0){
             initializeSoccerCharacters();
@@ -3146,17 +2269,12 @@ draw = function() {
         fill(35, 69, 15);
         var f = createFont("Calibri");
         textFont(f, 15);
+        text("Press 'q'key to go back", 5, 380, 400, 300);
         
-       
-        // for(var dwi=0; i<players.length; i++){
-            for(var i
-            =6; i<12; i++){
+        for(var i=0; i<players.length; i++){
             players[i].draw();
-             var currstate = players[i].currentState;
-             players[i].state[currstate].execute(players[i]);
-             if(currstate !== 0){
-                updateLocation(players[i]);
-             }
+            var currstate = players[i].currentstate;
+            players[i].state[currstate].execute(players[i]);
         }
         
         for(var i=0; i<teams.length; i++){
@@ -3165,88 +2283,41 @@ draw = function() {
         for(var i=0; i<team0_attackingArea.length; i++){
             rect(team0_attackingArea[i].x, team0_attackingArea[i].y,5,5);
         }
+        
         for(var i=0; i<team1_attackingArea.length; i++){
             rect(team1_attackingArea[i].x, team1_attackingArea[i].y,5,5);
         }
+        controlPlayer_move(players[teams[1].controlPlayer]);
         ball.move();
         ball.draw();
-        controlPlayer_move(players[teams[1].controlPlayer]);
-        
-        popMatrix();
-        if(k_timeout < frameCount-20){
-            k_pass = 0;   
-        }
-        checkForGoal();
-        
-    }
-    if(game_vars.goalScreen ===1 ){
-        background(random(255),random(255),random(255) );
-        var f = createFont("Bauhaus 93");
-        textFont(f, 25);
-        text("GOAL !!!  ", 150, 200, 200,100);
-        if(goalTime < frameCount-30){
-             game_vars.goalScreen = 0;
-             game_vars.gamescreen2 = 1;
-            kickofTime = frameCount;
-        }
-        
-        ball.position.y = 200;
-        ball.position.x = 200;
-        ball.velocity.set(0);
-        teams[1].changeState(prepareToKickoff_state);
-        teams[0].changeState(prepareToKickoff_state);
+        fill(7, 230, 130);
+        text("Press 'q' to exit", 10, 380);
     }
     
      if(game_vars.gamescreen1 === 1){
-	if(frameCount%2===0){
+       
         pushMatrix();
         background(76, 219, 224);
         translate(-90,-130);
         scale(1,1);
-        //board.draw();
+        board.draw();
         popMatrix();
-        drawboard();
-	}
         var f = createFont("Bauhaus 93");
         textFont(f, 15);
-	fill(255,255,0);
-	if(a_h_player === 1){
-		textSize(19);
-		text("Human is Black ",20,360,400,400);
-
-	}
-	if(a_h_player === 0){
-		textSize(19);
-		text("Human is White ",20,360,400,400);
-
-	}
         if(a_player === 1){
             textSize(30);
             fill(0, 0, 0);
             text("Black's Turn.",20,335,300,300);
             textSize(19);
-            //text("Press mouse anywhere to see computer play.",10,360,440,300);
+            text("Press mouse anywhere to see computer play.",10,360,440,300);
         }       
         else if(a_player === 0){
             fill(255,255,255);
             textSize(30);
             text("White's Turn",20,335,300,300);
             textSize(19);
-            //text("Press mouse on a tile to play.",10,360,440,300); 
+            text("Press mouse on a tile to play.",10,360,440,300); 
         }
-        a_score_1=0;
-        a_score_0=0;
-	    for(var x=0;x<8;x++){
-		for(var y=0;y<8;y++){
-			if(board_map[x][y] === 1){
-				a_score_1+=1;
-			}
-			if(board_map[x][y] === 0){
-				a_score_0+=1;
-			}
-		}
-	    }
-	text("W: " + a_score_0 + " B: " + a_score_1,30,30,300,300);
         
         fill(35, 69, 15);
         var f = createFont("Calibri");
@@ -3255,108 +2326,45 @@ draw = function() {
         
     }
     if(game_vars.endscreen1 === 1){
-	    //println("Executing end screen");
-	    pushMatrix();
         background(255, 0, 0);
         background(255, 0, 0);
         image(a_final_board,0,0,400,400);
-        textSize(35);
-       if(a_get_score === 0){ 
-	//println("Getting score");
-	a_get_score = 1;
-        a_score_1=0;
-        a_score_0=0;
+        textSize(30);
+        
+	    var score_1,score_0;
+        score_1=0;
+        score_0=0;
 	    for(var x=0;x<8;x++){
 		for(var y=0;y<8;y++){
 			if(board_map[x][y] === 1){
-				a_score_1+=1;
+				score_1+=1;
 			}
 			if(board_map[x][y] === 0){
-				a_score_0+=1;
+				score_0+=1;
 			}
 		}
-	    }
-	    }
-	    fill(0,0,0,75);
+		fill(0,0,0,25);
 	    rect(0,0,400,400);
 	    fill(0, 251, 255);
+	    var f = createFont("Bauhaus 93");
+        textFont(f, 30);
 	    text("Game Over !",30,100,300,300);
-	    if(a_score_0 > a_score_1){
-		    fill(255,255,255);
+	    if(score_0 > score_1){
 		    text("White Won ",30,200,300,300);
 	    }
-	    else if(a_score_1 > a_score_0){
-		    fill(255,255,255);
+	    else if(score_1 > score_0){
 		    text("Black Won ",30,200,300,300);
 	    }
-	    text("W: " + a_score_0 + " B: " + a_score_1,30,230,300,300);
-	    
-	    //else if(score_1 === score_0){
-		//    text("W: " + score_0 + " B: " + score_1,30,230,300,300);
-		 //   text("Draw",30,200,300,300);
-	   // }
+	    else if(score_1 === score_0){
+		    text("Draw",30,200,300,300);
+	    }
         
+    }
     
-    popMatrix();
-        fill(35, 69, 15);
-        var f = createFont("Calibri");
-        textFont(f, 15);
-        text("Press 'q' to exit", 15, 395);
-        
-        
-
     }
-
-    if(game_vars.optionscreen1 === 1){
-	    strokeWeight(10);
-	    stroke(0,0,0);
-        background(255, 0, 0);
-	fill(0,255,0);
-	if(a_h_player === 0){
-	fill(255,255,0);
-	}
-	rect(0,0,100,400);
-	fill(0,255,0);
-	if(a_h_player === 1){
-	fill(255,255,0);
-	}
-	rect(100,0,100,400);
-	fill(0,255,255);
-	if(a_difficulty === 0){
-	fill(255,255,0);
-	}
-	rect(200,0,200,133);
-	fill(0,255,255);
-	if(a_difficulty === 1){
-	fill(255,255,0);
-	}
-	rect(200,133,200,133);
-	fill(0,255,255);
-	if(a_difficulty === 2){
-	fill(255,255,0);
-	}
-	rect(200,266,200,133);
-	fill(255,0,0);
-	textSize(20);
-	text("Click to choose the tile color",10,110,300,300);
-	text("Choose difficulty",220,30,300,300);
-	fill(255,255,255);
-	ellipse(50,200,70,70);
-	fill(0,0,0);
-	ellipse(150,200,70,70);
-	fill(0,0,0);
-	textSize(20);
-	text("Easy",250,75,300,300);
-	text("Medium",250,75+133,300,300);
-	text("Hard",250,75 + 266,300,300);
-        fill(35, 69, 15);
-        var f = createFont("Calibri");
-        textFont(f, 15);
-        text("Press 'q' to exit", 15, 395);
-        
-
-    }
-
 };
+
+
+
 
 }};
