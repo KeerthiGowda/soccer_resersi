@@ -1334,6 +1334,7 @@ mouseClicked = function(){
             }
 	    }
 	    else{
+			a_last_flipped = best_result;
             for(var i=0;i<best_result.length;i+=2){
                 board_map[best_result[i+1]][best_result[i]] = a_player;
             }
@@ -3005,7 +3006,7 @@ draw = function() {
         var f = createFont("Bauhaus 93");
         textFont(f, 40);
         fill(161, 39, 8);
-        text("Board and field game",10,40,450,200);
+        text("Fun2Shh",130,40,450,200);
         fill(54, 42, 19);
          textFont(f, 30);
         text("Reversi " ,150,100,300,200);
