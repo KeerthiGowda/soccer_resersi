@@ -1,7 +1,8 @@
 var sketchProc=function(processingInstance){ with (processingInstance){
 size(400, 400); 
+
 frameRate(60);
-	
+
 translate(0,0);
 angleMode = "radian";
 var oneDegree = 3.14/180;
@@ -3367,6 +3368,5 @@ draw = function() {
     }
 
 };
-
 
 }};
