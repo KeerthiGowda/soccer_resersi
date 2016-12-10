@@ -3934,12 +3934,20 @@ draw = function() {
 			}
 		}
 	    }
-	text("W: " + a_score_0 + " B: " + a_score_1,30,30,300,300);
+	textSize(25);
+	text("W: " + a_score_0 + " B: " + a_score_1,30,50,300,300);
+	fill(155,55,0);
+	textSize(15);
+	text("Press \"Z\" and \"X\" to Zoom in and use UP and DOWN buttons to change elevation.",10,10,390,300);
+	text("Use mouse to rotate camera.",210,30,380,40);
+	fill(255,255,0);
+	textSize(20);
+	text("Press mouse to see computer play",100,380,300,300);
         
         fill(35, 69, 15);
         var f = createFont("Calibri");
         textFont(f, 15);
-        text("Press 'q' to exit", 15, 395);
+        text("Press 'q' to exit", 5, 395);
         
     }
     if(game_vars.endscreen1 === 1){
